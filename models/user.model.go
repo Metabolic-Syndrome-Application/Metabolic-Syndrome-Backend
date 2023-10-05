@@ -18,13 +18,24 @@ type User struct {
 }
 
 type Patient struct {
-	ID        uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`
-	Username  string    `gorm:"type:varchar(255);not null"`
-	Email     string    `gorm:"uniqueIndex;not null"`
-	Password  string    `gorm:"not null"`
-	Role      string    `gorm:"type:varchar(255);not null"`
+	ID       uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`
+	Username string    `gorm:"type:varchar(255);not null"`
+	// Email     string    `gorm:"uniqueIndex;not null"`
+	Password  string `gorm:"not null"`
+	Role      string `gorm:"type:varchar(255);not null"`
 	Photo     string
 	Verified  bool `gorm:"not null"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+type Staff struct { // doctor nurse admin
+	ID       uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`
+	Username string    `gorm:"type:varchar(255);not null"`
+	// Email     string    `gorm:"uniqueIndex;not null"`
+	Password  string `gorm:"not null"`
+	Role      string `gorm:"type:varchar(255);not null"`
+	Verified  bool   `gorm:"not null"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
