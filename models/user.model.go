@@ -41,14 +41,14 @@ type Staff struct { // doctor nurse admin
 }
 
 type SignUpInput struct {
-	Username string `json:"name" binding:"required"`
+	Username string `json:"username" binding:"required"`
 	// Email           string `json:"email" binding:"required"`
 	Password        string `json:"password" binding:"required,min=8"`
 	PasswordConfirm string `json:"passwordConfirm" binding:"required"`
 }
 
 type SignInInput struct {
-	Username string `json:"name" binding:"required"`
+	Username string `json:"username" binding:"required"`
 	// Email    string `json:"email"  binding:"required"`
 	Password string `json:"password"  binding:"required"`
 }
