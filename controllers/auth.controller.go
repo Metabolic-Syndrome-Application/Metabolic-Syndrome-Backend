@@ -30,6 +30,13 @@ func (ac *AuthController) SignUpUser(ctx *gin.Context) {
 		return
 	}
 
+	var user models.User
+	existingUser := ac.DB.First(&user, "Username = ?", strings.ToLower(payload.Username))
+	if existingUser.Error == nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Username is already in use"})
+		return
+	}
+
 	if payload.Password != payload.PasswordConfirm {
 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Passwords do not match"})
 		return
@@ -46,7 +53,7 @@ func (ac *AuthController) SignUpUser(ctx *gin.Context) {
 		Username: strings.ToLower(payload.Username),
 		// Email:     strings.ToLower(payload.Email),
 		Password:  hashedPassword,
-		Role:      "patient",
+		Role:      payload.Role,
 		Verified:  true,
 		CreatedAt: now,
 		UpdatedAt: now,
