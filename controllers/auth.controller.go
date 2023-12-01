@@ -61,6 +61,19 @@ func (ac *AuthController) SignUpUser(ctx *gin.Context) {
 
 	result := ac.DB.Create(&newUser)
 
+	if newUser.Role == "patient" {
+		newPatient := &models.Patient{
+			ID:       newUser.ID,
+			Username: strings.ToLower(payload.Username),
+		}
+		a := ac.DB.Create(&newPatient)
+		if a.Error != nil {
+			fmt.Println("Error:", a.Error)
+		} else {
+			fmt.Println("User created successfully")
+		}
+	}
+
 	if result.Error != nil && strings.Contains(result.Error.Error(), "duplicate key value violates unique") {
 		ctx.JSON(http.StatusConflict, gin.H{"status": "fail", "message": "User with that Username already exists"})
 		return
@@ -70,9 +83,8 @@ func (ac *AuthController) SignUpUser(ctx *gin.Context) {
 	}
 
 	userResponse := &models.UserResponse{
-		ID:       newUser.ID,
-		Username: newUser.Username,
-		// Email:     newUser.Email,
+		ID:        newUser.ID,
+		Username:  newUser.Username,
 		Role:      newUser.Role,
 		CreatedAt: newUser.CreatedAt,
 		UpdatedAt: newUser.UpdatedAt,
@@ -120,7 +132,7 @@ func (ac *AuthController) SignInUser(ctx *gin.Context) {
 	ctx.SetCookie("refresh_token", refresh_token, config.RefreshTokenMaxAge*60, "/", "localhost", false, true)
 	ctx.SetCookie("logged_in", "true", config.AccessTokenMaxAge*60, "/", "localhost", false, false)
 
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "access_token": access_token})
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "access_token": access_token}) //TODO:delete access_token
 }
 
 // [...] Refresh Access Token
