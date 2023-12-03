@@ -36,12 +36,27 @@ func (ac *AuthController) SignUpUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Username is already in use"})
 		return
 	}
+	// hash 13 number
+	// if !strings.Contains(payload.Username, "@") {
+	// 	hashedUsername, _ := utils.HashPassword(strings.ToLower(payload.Username))
+	// 	existingUser := ac.DB.First(&user, "Username = ?", hashedUsername)
+	// 	if existingUser.Error == nil {
+	// 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Username is already in use"})
+	// 		return
+	// 	}
+	// } else {
+	// 	existingUser := ac.DB.First(&user, "Username = ?", strings.ToLower(payload.Username))
+	// 	if existingUser.Error == nil {
+	// 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Username is already in use"})
+	// 		return
+	// 	}
 
 	if payload.Password != payload.PasswordConfirm {
 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Passwords do not match"})
 		return
 	}
 
+	// hashedPassword
 	hashedPassword, err := utils.HashPassword(payload.Password)
 	if err != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": err.Error()})
@@ -50,8 +65,6 @@ func (ac *AuthController) SignUpUser(ctx *gin.Context) {
 
 	now := time.Now()
 	newUser := models.User{
-		Username: strings.ToLower(payload.Username),
-		// Email:     strings.ToLower(payload.Email),
 		Password:  hashedPassword,
 		Role:      payload.Role,
 		Verified:  true,
@@ -59,12 +72,29 @@ func (ac *AuthController) SignUpUser(ctx *gin.Context) {
 		UpdatedAt: now,
 	}
 
+	// hash 13 number
+	// if !strings.Contains(payload.Username, "@") {
+	// 	fmt.Println("hash")
+	// 	hashedUsername, err := utils.HashPassword(strings.ToLower(payload.Username))
+	// 	if err != nil {
+	// 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": err.Error()})
+	// 		return
+	// 	}
+	// 	newUser.Username = hashedUsername
+	// } else {
+	// 	newUser.Username = strings.ToLower(payload.Username)
+	// 	fmt.Println("not hash")
+	// }
+
+	newUser.Username = strings.ToLower(payload.Username)
+	fmt.Println("not hash")
+
 	result := ac.DB.Create(&newUser)
 
 	if newUser.Role == "patient" {
 		newPatient := &models.Patient{
 			ID:       newUser.ID,
-			Username: strings.ToLower(payload.Username),
+			Username: strings.ToLower(payload.Username), //TODO: delete Username
 		}
 		a := ac.DB.Create(&newPatient)
 		if a.Error != nil {
@@ -108,8 +138,31 @@ func (ac *AuthController) SignInUser(ctx *gin.Context) {
 		return
 	}
 
+	//hash 13 number
+	// if !strings.Contains(payload.Username, "@") {
+	// 	fmt.Println("not have @")
+	// 	hashedUsername, err := utils.HashPassword(strings.ToLower(payload.Username))
+	// 	if err != nil {
+	// 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message1": err.Error()})
+	// 		return
+	// 	}
+	// 	result := ac.DB.First(&user, "Username = ?", hashedUsername)
+	// 	fmt.Println("hashedUsername", hashedUsername)
+	// 	if result.Error != nil {
+	// 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message2": "Invalid Username or Password"})
+	// 		return
+	// 	}
+	// } else {
+	// 	result := ac.DB.First(&user, "Username = ?", strings.ToLower(payload.Username))
+	// 	fmt.Println("have @")
+	// 	if result.Error != nil {
+	// 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message3": "Invalid Username or Password"})
+	// 		return
+	// 	}
+	// }
+
 	if err := utils.VerifyPassword(user.Password, payload.Password); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Invalid Username or Password"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message4": "Invalid Username or Password"})
 		return
 	}
 
