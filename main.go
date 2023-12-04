@@ -31,7 +31,7 @@ func init() {
 	AuthRouteController = routes.NewAuthRouteController(AuthController)
 
 	UserController = controllers.NewUserController(initializers.DB)
-	UserRouteController = routes.NewRouteUserController(UserController)
+	UserRouteController = routes.NewUserRouteController(UserController)
 
 	server = gin.Default()
 }

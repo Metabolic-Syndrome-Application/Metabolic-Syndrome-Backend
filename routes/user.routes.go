@@ -10,12 +10,13 @@ type UserRouteController struct {
 	userController controllers.UserController
 }
 
-func NewRouteUserController(userController controllers.UserController) UserRouteController {
+func NewUserRouteController(userController controllers.UserController) UserRouteController {
 	return UserRouteController{userController}
 }
 
 func (uc *UserRouteController) UserRoute(rg *gin.RouterGroup) {
 
 	router := rg.Group("users")
-	router.GET("/me", middleware.DeserializeUser(), uc.userController.GetMe)
+	router.GET("/profile", middleware.DeserializeUser(), uc.userController.GetProfile)
+	router.POST("/profile", middleware.DeserializeUser(), uc.userController.CreateProfile)
 }

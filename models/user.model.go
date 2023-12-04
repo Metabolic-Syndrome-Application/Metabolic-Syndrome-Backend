@@ -17,9 +17,14 @@ type User struct {
 }
 
 type Patient struct {
-	ID       uuid.UUID `json:"id,omitempty"`
-	Username string    `gorm:"type:varchar(255);not null"`
-	Photo    string    `json:"photo,omitempty"`
+	ID          uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id,omitempty"`
+	Username    string    `gorm:"type:varchar(255);not null"`
+	Alias       string    `json:"alias,omitempty"`
+	FirstName   string    `json:"firstName,omitempty"`
+	LastName    string    `json:"lastName,omitempty"`
+	YearOfBirth string    `json:"yearOfBirth,omitempty"`
+	Gender      string    `json:"gender,omitempty"`
+	Photo       string    `json:"photo,omitempty"`
 }
 
 type SignUpInput struct {
@@ -42,4 +47,13 @@ type UserResponse struct {
 	Provider  string    `json:"provider"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+}
+
+type CreateProfilePatient struct {
+	Alias       string `json:"alias,omitempty"`
+	FirstName   string `json:"firstName,omitempty"`
+	LastName    string `json:"lastName,omitempty"`
+	YearOfBirth string `json:"yearOfBirth,omitempty"`
+	Gender      string `json:"gender,omitempty"`
+	Photo       string `json:"photo,omitempty"`
 }
