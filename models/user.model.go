@@ -22,7 +22,6 @@ func (User) TableName() string {
 
 type Doctor struct {
 	ID         uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
-	Username   string    `gorm:"type:varchar(255);not null" json:"username"`
 	Prefix     string    `json:"prefix,omitempty"`
 	FirstName  string    `json:"firstName,omitempty"`
 	LastName   string    `json:"lastName,omitempty"`
@@ -37,7 +36,6 @@ func (Doctor) TableName() string {
 
 type Staff struct {
 	ID         uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
-	Username   string    `gorm:"type:varchar(255);not null" json:"username"`
 	Prefix     string    `json:"prefix,omitempty"`
 	FirstName  string    `json:"firstName,omitempty"`
 	LastName   string    `json:"lastName,omitempty"`
