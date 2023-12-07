@@ -15,22 +15,21 @@ type UserController struct {
 func NewUserController(DB *gorm.DB) UserController {
 	return UserController{DB}
 }
-func (uc *UserController) CreateProfile(ctx *gin.Context) {
-	// postId := ctx.Param("id")
+func (uc *UserController) UpdateProfile(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 
-	var payload *models.CreateProfilePatient
+	var payload *models.UpdateProfilePatient
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
 		return
 	}
-	var createProfilePatient models.Patient
-	result := uc.DB.First(&createProfilePatient, "id = ?", currentUser.ID)
+	var updateProfilePatient models.Patient
+	result := uc.DB.First(&updateProfilePatient, "id = ?", currentUser.ID)
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No post with that title exists"})
 		return
 	}
-	createPatient := &models.Patient{
+	updatePatient := &models.Patient{
 		Alias:       payload.Alias,
 		FirstName:   payload.FirstName,
 		LastName:    payload.LastName,
@@ -39,12 +38,12 @@ func (uc *UserController) CreateProfile(ctx *gin.Context) {
 		Photo:       payload.Photo,
 	}
 
-	a := uc.DB.Model(&createProfilePatient).Updates(createPatient)
+	a := uc.DB.Model(&updateProfilePatient).Updates(updatePatient)
 	if a.Error != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not create profile patient"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update profile patient"})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Create profile patient success"})
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Update profile patient success"})
 
 }
 

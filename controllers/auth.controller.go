@@ -89,18 +89,39 @@ func (ac *AuthController) SignUpUser(ctx *gin.Context) {
 	newUser.Username = strings.ToLower(payload.Username)
 	fmt.Println("not hash")
 
+	// สร้าง db User
 	result := ac.DB.Create(&newUser)
 
+	// สร้าง db patient
 	if newUser.Role == "patient" {
 		newPatient := &models.Patient{
-			ID:       newUser.ID,
-			Username: strings.ToLower(payload.Username), //TODO: delete Username
+			ID: newUser.ID,
 		}
 		a := ac.DB.Create(&newPatient)
 		if a.Error != nil {
 			fmt.Println("Error:", a.Error)
 		} else {
-			fmt.Println("User created successfully")
+			fmt.Println("User created successfully /patient")
+		}
+	} else if newUser.Role == "doctor" {
+		newDoctor := &models.Doctor{
+			ID: newUser.ID,
+		}
+		a := ac.DB.Create(&newDoctor)
+		if a.Error != nil {
+			fmt.Println("Error:", a.Error)
+		} else {
+			fmt.Println("User created successfully /doctor")
+		}
+	} else if newUser.Role == "staff" {
+		newStaff := &models.Staff{
+			ID: newUser.ID,
+		}
+		a := ac.DB.Create(&newStaff)
+		if a.Error != nil {
+			fmt.Println("Error:", a.Error)
+		} else {
+			fmt.Println("User created successfully /staff")
 		}
 	}
 
