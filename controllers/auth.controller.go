@@ -86,7 +86,7 @@ func (ac *AuthController) SignUpUser(ctx *gin.Context) {
 	// 	fmt.Println("not hash")
 	// }
 
-	// newUser.Username = strings.ToLower(payload.Username)
+	newUser.Username = strings.ToLower(payload.Username)
 	fmt.Println("not hash")
 
 	// สร้าง db User

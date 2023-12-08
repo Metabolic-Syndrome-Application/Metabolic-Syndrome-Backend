@@ -49,18 +49,18 @@ func (Staff) TableName() string {
 }
 
 type Patient struct {
-	ID                 uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
-	HN                 string    `json:"hn,omitempty"`
-	Alias              string    `json:"alias,omitempty"`
-	FirstName          string    `json:"firstName,omitempty"`
-	LastName           string    `json:"lastName,omitempty"`
-	YearOfBirth        string    `json:"yearOfBirth,omitempty"`
-	Gender             string    `json:"gender,omitempty"`
-	MainDoctorId       uuid.UUID `gorm:"type:uuid" json:"mainDoctorId,omitempty"`
-	MainDoctor         Doctor    `gorm:"foreignKey:MainDoctorId;" json:"mainDoctor,omitempty"`
-	AssistanceDoctorId uuid.UUID `gorm:"type:uuid" json:"assistanceDoctorId,omitempty"`
-	AssistanceDoctor   Doctor    `gorm:"foreignKey:AssistanceDoctorId;" json:"assistanceDoctor,omitempty"`
-	Photo              string    `json:"photo,omitempty"`
+	ID                 uuid.UUID  `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
+	HN                 string     `json:"hn,omitempty"`
+	Alias              string     `json:"alias,omitempty"`
+	FirstName          string     `json:"firstName,omitempty"`
+	LastName           string     `json:"lastName,omitempty"`
+	YearOfBirth        string     `json:"yearOfBirth,omitempty"`
+	Gender             string     `json:"gender,omitempty"`
+	MainDoctorId       *uuid.UUID `gorm:"type:uuid ;null" json:"mainDoctorId,omitempty"`
+	MainDoctor         Doctor     `gorm:"foreignKey:MainDoctorId; " json:"mainDoctor,omitempty"`
+	AssistanceDoctorId *uuid.UUID `gorm:"type:uuid ;null" json:"assistanceDoctorId,omitempty"`
+	AssistanceDoctor   Doctor     `gorm:"foreignKey:AssistanceDoctorId;" json:"assistanceDoctor,omitempty"`
+	Photo              string     `json:"photo,omitempty"`
 }
 
 func (Patient) TableName() string {
