@@ -25,12 +25,13 @@ func (uc *UserController) UpdateProfile(ctx *gin.Context) {
 	// patient
 	if currentUser.Role == "patient" {
 		var payload = struct {
-			Alias       string `json:"alias,omitempty"`
-			FirstName   string `json:"firstName"`
-			LastName    string `json:"lastName"`
-			YearOfBirth string `json:"yearOfBirth,omitempty"`
-			Gender      string `json:"gender,omitempty"`
-			Photo       string `json:"photo,omitempty"`
+			Alias        string     `json:"alias,omitempty"`
+			FirstName    string     `json:"firstName"`
+			LastName     string     `json:"lastName"`
+			YearOfBirth  string     `json:"yearOfBirth,omitempty"`
+			Gender       string     `json:"gender,omitempty"`
+			Photo        string     `json:"photo,omitempty"`
+			MainDoctorId *uuid.UUID `gorm:"type:uuid ;null" json:"mainDoctorId,omitempty"`
 		}{} // {} = default is null
 		if err := ctx.ShouldBindJSON(&payload); err != nil {
 			ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
@@ -43,12 +44,13 @@ func (uc *UserController) UpdateProfile(ctx *gin.Context) {
 			return
 		}
 		updatePatient := &models.Patient{
-			Alias:       payload.Alias,
-			FirstName:   payload.FirstName,
-			LastName:    payload.LastName,
-			YearOfBirth: payload.YearOfBirth,
-			Gender:      payload.Gender,
-			Photo:       payload.Photo,
+			Alias:        payload.Alias,
+			FirstName:    payload.FirstName,
+			LastName:     payload.LastName,
+			YearOfBirth:  payload.YearOfBirth,
+			Gender:       payload.Gender,
+			Photo:        payload.Photo,
+			MainDoctorId: payload.MainDoctorId,
 		}
 
 		a := uc.DB.Model(&updateProfilePatient).Updates(updatePatient)
@@ -174,8 +176,9 @@ func (uc *UserController) GetProfile(ctx *gin.Context) {
 
 // get profile all
 func (uc *UserController) GetAllUserProfile(ctx *gin.Context) {
-	userRole := ctx.Param("role")
-	if userRole == "patient" {
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	// staff can manage all patient
+	if currentUser.Role == "staff" {
 		var patients []models.Patient
 		result := uc.DB.Find(&patients)
 		if result.Error != nil {
@@ -183,30 +186,32 @@ func (uc *UserController) GetAllUserProfile(ctx *gin.Context) {
 			return
 		}
 		type Response struct {
-			ID          uuid.UUID `json:"id"`
-			HN          string    `json:"hn,omitempty"`
-			FirstName   string    `json:"firstName,omitempty"`
-			LastName    string    `json:"lastName,omitempty"`
-			Gender      string    `json:"gender,omitempty"`
-			YearOfBirth string    `json:"yearOfBirth,omitempty"`
-			Status      string    `json:"status,omitempty"`
-			// MainDoctorId *uuid.UUID `gorm:"type:uuid ;null" json:"mainDoctorId,omitempty"` //TODO:ใส่เป็นชื่อหมอ
+			ID           uuid.UUID  `json:"id"`
+			HN           string     `json:"hn,omitempty"`
+			FirstName    string     `json:"firstName,omitempty"`
+			LastName     string     `json:"lastName,omitempty"`
+			Gender       string     `json:"gender,omitempty"`
+			YearOfBirth  string     `json:"yearOfBirth,omitempty"`
+			Status       string     `json:"status,omitempty"`
+			MainDoctorId *uuid.UUID `gorm:"type:uuid ;null" json:"mainDoctorId,omitempty"` //TODO:ใส่เป็นชื่อหมอ
 		}
 		var data []Response
 		for _, patient := range patients {
 			response := Response{
-				ID:          patient.ID,
-				HN:          patient.HN,
-				FirstName:   patient.FirstName,
-				LastName:    patient.LastName,
-				Gender:      patient.Gender,
-				YearOfBirth: patient.YearOfBirth,
-				Status:      patient.Status,
+				ID:           patient.ID,
+				HN:           patient.HN,
+				FirstName:    patient.FirstName,
+				LastName:     patient.LastName,
+				Gender:       patient.Gender,
+				YearOfBirth:  patient.YearOfBirth,
+				Status:       patient.Status,
+				MainDoctorId: patient.MainDoctorId,
 			}
 			data = append(data, response)
 		}
 		ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"users": data}})
-	} else if userRole == "doctor-staff" {
+		// admin can manage all doctor and staff
+	} else if currentUser.Role == "admin" {
 		var doctors []models.Doctor
 		result1 := uc.DB.Find(&doctors)
 		var staffs []models.Staff
@@ -254,6 +259,38 @@ func (uc *UserController) GetAllUserProfile(ctx *gin.Context) {
 		}
 		ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"users": data}})
 
+	} else if currentUser.Role == "doctor" {
+		var patients []models.Patient
+		result := uc.DB.Where("main_doctor_id = ?", currentUser.ID).Find(&patients)
+		if result.Error != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "fail", "message": "Error fetching patient data"})
+			return
+		}
+		type Response struct {
+			ID           uuid.UUID  `json:"id"`
+			HN           string     `json:"hn,omitempty"`
+			FirstName    string     `json:"firstName,omitempty"`
+			LastName     string     `json:"lastName,omitempty"`
+			Gender       string     `json:"gender,omitempty"`
+			YearOfBirth  string     `json:"yearOfBirth,omitempty"`
+			Status       string     `json:"status,omitempty"`
+			MainDoctorId *uuid.UUID `gorm:"type:uuid ;null" json:"mainDoctorId,omitempty"` //TODO:ใส่เป็นชื่อหมอ
+		}
+		var data []Response
+		for _, patient := range patients {
+			response := Response{
+				ID:           patient.ID,
+				HN:           patient.HN,
+				FirstName:    patient.FirstName,
+				LastName:     patient.LastName,
+				Gender:       patient.Gender,
+				YearOfBirth:  patient.YearOfBirth,
+				Status:       patient.Status,
+				MainDoctorId: patient.MainDoctorId,
+			}
+			data = append(data, response)
+		}
+		ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"users": data}})
 	} else {
 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Invalid role"})
 	}

@@ -20,6 +20,6 @@ func (uc *UserRouteController) UserRoute(rg *gin.RouterGroup) {
 	router.GET("/profile", middleware.DeserializeUser(), uc.userController.GetProfile)     // get profile me
 	router.POST("/profile", middleware.DeserializeUser(), uc.userController.UpdateProfile) // post profile me
 
-	router.GET("/profile/:role", uc.userController.GetAllUserProfile) // get profile with role
+	router.GET("/profile/all", middleware.DeserializeUser(), uc.userController.GetAllUserProfile) // get profile all (depend on currentUser.Role)
 	// router.GET("/profile/:role/:id", uc.userController.GetOtherProfile) // get profile other profile
 }
