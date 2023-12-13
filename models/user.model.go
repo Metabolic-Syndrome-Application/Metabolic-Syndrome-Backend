@@ -67,6 +67,7 @@ type Patient struct {
 	ChallengeID        *uuid.UUID `gorm:"type:uuid ;null" json:"challengeID,omitempty"`
 	Challenge          Challenge  `gorm:"foreignKey:ChallengeID;" json:"challenge,omitempty"`
 	CollectPoints      int        `json:"collectPoints,omitempty"`
+	Status             string     `json:"status,omitempty"`
 }
 
 func (Patient) TableName() string {

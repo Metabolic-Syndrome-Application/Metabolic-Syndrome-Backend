@@ -17,6 +17,9 @@ func NewUserRouteController(userController controllers.UserController) UserRoute
 func (uc *UserRouteController) UserRoute(rg *gin.RouterGroup) {
 
 	router := rg.Group("user")
-	router.GET("/profile", middleware.DeserializeUser(), uc.userController.GetProfile)
-	router.POST("/profile", middleware.DeserializeUser(), uc.userController.UpdateProfile)
+	router.GET("/profile", middleware.DeserializeUser(), uc.userController.GetProfile)     // get profile me
+	router.POST("/profile", middleware.DeserializeUser(), uc.userController.UpdateProfile) // post profile me
+
+	router.GET("/profile/:role", uc.userController.GetAllUserProfile) // get profile with role
+	// router.GET("/profile/:role/:id", uc.userController.GetOtherProfile) // get profile other profile
 }
