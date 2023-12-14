@@ -21,5 +21,9 @@ func (uc *UserRouteController) UserRoute(rg *gin.RouterGroup) {
 	router.POST("/profile", middleware.DeserializeUser(), uc.userController.UpdateProfile) // post profile me
 
 	router.GET("/profile/all", middleware.DeserializeUser(), uc.userController.GetAllUserProfile) // get profile all (depend on currentUser.Role)
-	// router.GET("/profile/:role/:id", uc.userController.GetOtherProfile) // get profile other profile
+
+	router.POST("/profile/:role/:id", uc.userController.PostOtherProfile) // post profile other profile
+	router.GET("/profile/:role/:id", uc.userController.GetOtherProfile)   // get profile other profile
+	router.DELETE("/profile/:role/:id", uc.userController.DeleteUser)     // delete user
+
 }

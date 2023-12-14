@@ -54,7 +54,7 @@ type Patient struct {
 	Alias              string     `json:"alias,omitempty"`
 	FirstName          string     `json:"firstName,omitempty"`
 	LastName           string     `json:"lastName,omitempty"`
-	YearOfBirth        string     `json:"yearOfBirth,omitempty"`
+	YearOfBirth        int        `json:"yearOfBirth,omitempty"`
 	Gender             string     `json:"gender,omitempty"`
 	Photo              string     `json:"photo,omitempty"`
 	MainDoctorId       *uuid.UUID `gorm:"type:uuid ;null" json:"mainDoctorId,omitempty"`
