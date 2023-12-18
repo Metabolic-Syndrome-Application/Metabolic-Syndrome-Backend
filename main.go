@@ -61,5 +61,6 @@ func main() {
 
 	AuthRouteController.AuthRoute(router)
 	UserRouteController.UserRoute(router)
+	ScreeningRouteController.ScreeningRoute(router)
 	log.Fatal(server.Run(":" + config.ServerPort))
 }

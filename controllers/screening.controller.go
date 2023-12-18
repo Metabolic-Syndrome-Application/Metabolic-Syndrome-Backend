@@ -43,7 +43,7 @@ func (sc *ScreeningController) MetabolicRisk(ctx *gin.Context) {
 	}
 	var risk = 0
 
-	// screenning Waistline and HDL
+	// screening Waistline and HDL
 	if ProfilePatient.Gender == "female" {
 		if payload.Waistline >= 80 {
 			risk = risk + 1
@@ -60,28 +60,41 @@ func (sc *ScreeningController) MetabolicRisk(ctx *gin.Context) {
 		}
 	}
 
-	// screenning BloodGlucose
+	// screening BloodGlucose
 	if payload.BloodGlucose > 100 {
 		risk = risk + 1
 	}
 
-	// screenning BloodPressure
+	// screening BloodPressure
 	if payload.SystolicBloodPressure > 130 || payload.DiastolicBloodPressure > 85 {
 		risk = risk + 1
 	}
 
-	// screenning Triglyceride
+	// screening Triglyceride
 	if payload.Triglyceride > 150 {
 		risk = risk + 1
 	}
 
 	// result
+	var metabolicRisk = ""
 	if risk <= 1 {
-		ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"metabolicRisk": "low"}})
+		metabolicRisk = "low"
+
+		updateRisk := &models.Patient{
+			DiseaseRisk: "metabolic",
+		}
+
+		result := sc.DB.Model(&ProfilePatient).Updates(updateRisk)
+		if result.Error != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update profile Staff"})
+			return
+		}
 	} else if risk == 2 {
-		ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"metabolicRisk": "medium"}})
+		metabolicRisk = "medium"
 	} else if risk >= 3 {
-		ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"metabolicRisk": "high"}})
+		metabolicRisk = "high"
 	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"metabolicRisk": metabolicRisk}})
 
 }

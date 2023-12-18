@@ -18,5 +18,4 @@ func (sc *ScreeningRouteController) ScreeningRoute(rg *gin.RouterGroup) {
 
 	router := rg.Group("screening")
 	router.POST("/metabolic", middleware.DeserializeUser(), sc.screeningController.MetabolicRisk)
-
 }
