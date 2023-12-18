@@ -12,11 +12,13 @@ import (
 )
 
 var (
-	server              *gin.Engine
-	AuthController      controllers.AuthController
-	AuthRouteController routes.AuthRouteController
-	UserController      controllers.UserController
-	UserRouteController routes.UserRouteController
+	server                   *gin.Engine
+	AuthController           controllers.AuthController
+	AuthRouteController      routes.AuthRouteController
+	UserController           controllers.UserController
+	UserRouteController      routes.UserRouteController
+	ScreeningController      controllers.ScreeningController
+	ScreeningRouteController routes.ScreeningRouteController
 )
 
 func init() {
@@ -32,6 +34,9 @@ func init() {
 
 	UserController = controllers.NewUserController(initializers.DB)
 	UserRouteController = routes.NewUserRouteController(UserController)
+
+	ScreeningController = controllers.NewScreeningController(initializers.DB)
+	ScreeningRouteController = routes.NewScreeningRouteController(ScreeningController)
 
 	server = gin.Default()
 }

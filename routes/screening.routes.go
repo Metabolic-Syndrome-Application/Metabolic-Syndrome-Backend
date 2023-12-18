@@ -14,9 +14,9 @@ func NewScreeningRouteController(screeningController controllers.ScreeningContro
 	return ScreeningRouteController{screeningController}
 }
 
-func (uc *ScreeningRouteController) ScreeningRoute(rg *gin.RouterGroup) {
+func (sc *ScreeningRouteController) ScreeningRoute(rg *gin.RouterGroup) {
 
 	router := rg.Group("screening")
-	router.POST("/metabolic", middleware.DeserializeUser(), uc.screeningController.MetabolicRisk) // post profile me
+	router.POST("/metabolic", middleware.DeserializeUser(), sc.screeningController.MetabolicRisk)
 
 }
