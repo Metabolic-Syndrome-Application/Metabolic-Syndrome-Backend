@@ -206,7 +206,13 @@ func (ac *AuthController) SignInUser(ctx *gin.Context) {
 	ctx.SetCookie("refresh_token", refresh_token, config.RefreshTokenMaxAge*60, "/", "localhost", false, true)
 	ctx.SetCookie("logged_in", "true", config.AccessTokenMaxAge*60, "/", "localhost", false, false)
 
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "access_token": access_token}) //TODO:delete access_token
+	if user.Role == "patient" {
+
+		ctx.JSON(http.StatusOK, gin.H{"status": "success", "access_token": access_token})
+	} else {
+		ctx.JSON(http.StatusOK, gin.H{"status": "success", "user": gin.H{"username": user.Username, "role": user.Role}, "access_token": access_token})
+
+	}
 }
 
 // [...] Refresh Access Token
