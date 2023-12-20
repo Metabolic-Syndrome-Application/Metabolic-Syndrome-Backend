@@ -56,6 +56,7 @@ type Patient struct {
 	LastName           string     `json:"lastName,omitempty"`
 	YearOfBirth        int        `json:"yearOfBirth,omitempty"`
 	Gender             string     `json:"gender,omitempty"`
+	Occupation         string     `json:"occupation,omitempty"`
 	Photo              string     `json:"photo,omitempty"`
 	MainDoctorId       *uuid.UUID `gorm:"type:uuid ;null" json:"mainDoctorId,omitempty"`
 	MainDoctor         Doctor     `gorm:"foreignKey:MainDoctorId; " json:"mainDoctor,omitempty"`

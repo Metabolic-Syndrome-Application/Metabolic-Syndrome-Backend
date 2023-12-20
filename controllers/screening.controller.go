@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ployns/Metabolic-Syndrome-Backend/models"
@@ -93,6 +94,42 @@ func (sc *ScreeningController) MetabolicRisk(ctx *gin.Context) {
 		metabolicRisk = "medium"
 	} else if risk >= 3 {
 		metabolicRisk = "high"
+	}
+
+	// add data Occupation
+	updatePatient := &models.Patient{
+		Occupation: payload.Occupation,
+	}
+	result2 := sc.DB.Model(&ProfilePatient).Updates(updatePatient)
+	if result2.Error != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update profile Staff"})
+		return
+	}
+
+	//init the loc
+	loc, _ := time.LoadLocation("Asia/Bangkok")
+
+	//set timezone,
+	now := time.Now().In(loc)
+	newRecordHealth := &models.RecordHealth{
+		PatientId:              ProfilePatient.ID,
+		Height:                 payload.Height,
+		Weight:                 payload.Weight,
+		Waistline:              payload.Waistline,
+		SystolicBloodPressure:  payload.SystolicBloodPressure,
+		DiastolicBloodPressure: payload.DiastolicBloodPressure,
+		PulseRate:              payload.PulseRate,
+		BloodGlucose:           payload.BloodGlucose,
+		Triglyceride:           payload.Triglyceride,
+		HDL:                    payload.HDL,
+		RecordBy:               currentUser.Role,
+		Timestamp:              now,
+	}
+	result3 := sc.DB.Create(&newRecordHealth)
+
+	if result3.Error != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not create RecordHealth"})
+		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"metabolicRisk": metabolicRisk}})
