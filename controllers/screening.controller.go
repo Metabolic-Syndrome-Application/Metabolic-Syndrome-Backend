@@ -26,7 +26,7 @@ func (sc *ScreeningController) MetabolicRisk(ctx *gin.Context) {
 		return
 	}
 	var payload = struct {
-		Occupation             string
+		Occupation             string  `json:"occupation,omitempty"`
 		Height                 float32 `json:"height,omitempty"`
 		Weight                 float32 `json:"weight,omitempty"`
 		BMI                    float32 `json:"bmi,omitempty"`
@@ -47,42 +47,46 @@ func (sc *ScreeningController) MetabolicRisk(ctx *gin.Context) {
 	// screening Waistline and HDL
 	if ProfilePatient.Gender == "female" {
 		if payload.Waistline >= 80 {
-			risk = risk + 1
+			risk += 1
 		}
 		if payload.HDL < 50 {
-			risk = risk + 1
+			risk += 1
 		}
 	} else if ProfilePatient.Gender == "male" {
 		if payload.Waistline >= 90 {
-			risk = risk + 1
+			risk += 1
 		}
 		if payload.HDL < 40 {
-			risk = risk + 1
+			risk += 1
 		}
 	}
 
 	// screening BloodGlucose
 	if payload.BloodGlucose > 100 {
-		risk = risk + 1
+		risk += 1
 	}
 
 	// screening BloodPressure
 	if payload.SystolicBloodPressure > 130 || payload.DiastolicBloodPressure > 85 {
-		risk = risk + 1
+		risk += 1
 	}
 
 	// screening Triglyceride
 	if payload.Triglyceride > 150 {
-		risk = risk + 1
+		risk += 1
 	}
 
 	// result
-	var metabolicRisk = ""
+	metabolicRisk := ""
 	if risk <= 1 {
 		metabolicRisk = "low"
 
 		updateRisk := &models.Patient{
-			DiseaseRisk: "metabolic",
+			DiseaseRisk: models.DiseaseRisk{
+				Diabetes:       "metabolic",
+				Hyperlipidemia: "metabolic",
+				Hypertension:   "metabolic",
+				Obesity:        "metabolic"},
 		}
 
 		result := sc.DB.Model(&ProfilePatient).Updates(updateRisk)
@@ -134,4 +138,141 @@ func (sc *ScreeningController) MetabolicRisk(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"metabolicRisk": metabolicRisk}})
 
+}
+
+func (sc *ScreeningController) DiseaseRisk(ctx *gin.Context) {
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	var ProfilePatient models.Patient
+	result := sc.DB.First(&ProfilePatient, "id = ?", currentUser.ID)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No post with that title exists"})
+		return
+	}
+	var RecordHealthPatient models.RecordHealth
+	result2 := sc.DB.First(&RecordHealthPatient, "patient_id = ?", currentUser.ID)
+	if result2.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No post with that title exists"})
+		return
+	}
+
+	payload := struct {
+		Disease       []string `json:"disease,omitempty"`
+		FamilyDisease []string `json:"familyDisease,omitempty"`
+	}{}
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+
+	//screening diabetes
+	calDiabetes := func() string {
+		countDiabetes := 0
+		//age
+		currentYear := time.Now().Year()
+		age := (currentYear + 543) - ProfilePatient.YearOfBirth
+		if age >= 35 && age < 45 {
+			countDiabetes += 1
+		} else if age >= 45 && age < 50 {
+			countDiabetes += 2
+		} else if age >= 50 && age < 60 {
+			countDiabetes += 3
+		} else if age >= 60 {
+			countDiabetes += 4
+		}
+		//bmi
+		bmi := RecordHealthPatient.Weight / (float32(RecordHealthPatient.Height) / 100)
+		if bmi >= 23 && bmi < 27.5 {
+			countDiabetes += 1
+		} else if bmi >= 27.5 {
+			countDiabetes += 3
+		}
+
+		//waist to height ratio
+		ratio := RecordHealthPatient.Waistline / float32(RecordHealthPatient.Height)
+		if ratio > 0.5 && ratio <= 0.6 {
+			countDiabetes += 3
+		} else if ratio > 0.6 {
+			countDiabetes += 5
+		}
+
+		//BloodPressure
+		if (RecordHealthPatient.SystolicBloodPressure >= 120 && RecordHealthPatient.SystolicBloodPressure < 140) && (RecordHealthPatient.DiastolicBloodPressure < 90) {
+			countDiabetes += 2
+		} else if RecordHealthPatient.SystolicBloodPressure >= 140 || RecordHealthPatient.DiastolicBloodPressure >= 90 {
+			countDiabetes += 4
+		}
+
+		//family diabetes
+		for _, value := range payload.FamilyDisease {
+			if value == "diabetes" {
+				countDiabetes += 2
+				break
+			}
+		}
+
+		//BloodGlucose
+		if RecordHealthPatient.BloodGlucose >= 100 {
+			countDiabetes += 5
+		}
+
+		//diabetes
+		for _, value := range payload.Disease {
+			if value == "diabetes" {
+				countDiabetes += 15
+				break
+			}
+		}
+
+		//result
+		if countDiabetes <= 7 {
+			return "low"
+		} else if countDiabetes > 7 && countDiabetes <= 14 {
+			return "medium"
+		} else {
+			return "high"
+		}
+
+	}
+
+	calHyperlipidemia := func() string {
+		countHyperlipidemia := 0
+		if RecordHealthPatient.HDL >= 60 {
+			countHyperlipidemia += 1
+		} else if RecordHealthPatient.HDL >= 45 {
+			countHyperlipidemia += 2
+		} else if RecordHealthPatient.HDL < 45 {
+			countHyperlipidemia += 4
+		}
+		if RecordHealthPatient.Triglyceride < 150 {
+			countHyperlipidemia += 1
+		} else if RecordHealthPatient.Triglyceride < 200 {
+			countHyperlipidemia += 2
+		} else if RecordHealthPatient.Triglyceride >= 200 {
+			countHyperlipidemia += 4
+		}
+
+		if countHyperlipidemia <= 2 {
+			return "low"
+		} else if countHyperlipidemia <= 4 {
+			return "medium"
+		} else {
+			return "high"
+		}
+
+	}
+
+	updateDiseaseRisk := &models.Patient{
+		DiseaseRisk: models.DiseaseRisk{
+			Diabetes:       calDiabetes(),
+			Hyperlipidemia: calHyperlipidemia(),
+			Hypertension:   "metabolic",
+			Obesity:        "metabolic"},
+	}
+	a := sc.DB.Model(&ProfilePatient).Updates(updateDiseaseRisk)
+	if a.Error != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update DiseaseRisk"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"diseaseRisk": ProfilePatient.DiseaseRisk}})
 }

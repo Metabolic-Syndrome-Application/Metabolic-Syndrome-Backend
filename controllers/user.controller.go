@@ -321,9 +321,14 @@ func (uc *UserController) PostOtherProfile(ctx *gin.Context) {
 			Gender             string     `json:"gender,omitempty"`
 			MainDoctorId       *uuid.UUID `gorm:"type:uuid ;null" json:"mainDoctorId,omitempty"`
 			AssistanceDoctorId *uuid.UUID `gorm:"type:uuid ;null" json:"assistanceDoctorId,omitempty"`
-			DiseaseRisk        string     `json:"diseaseRisk,omitempty"`
-			PlanID             *uuid.UUID `gorm:"type:uuid ;null" json:"planID,omitempty"`
-			Status             string     `gorm:"default:'in process' " json:"status,omitempty"`
+			DiseaseRisk        struct {
+				Diabetes       string `json:"diabetes"`
+				Hyperlipidemia string `json:"hyperlipidemia"`
+				Hypertension   string `json:"hypertension"`
+				Obesity        string `json:"obesity"`
+			} `json:"diseaseRisk"`
+			PlanID *uuid.UUID `gorm:"type:uuid ;null" json:"planID,omitempty"`
+			Status string     `gorm:"default:'in process' " json:"status,omitempty"`
 		}{} // {} = default is null
 		if err := ctx.ShouldBindJSON(&payload); err != nil {
 			ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
