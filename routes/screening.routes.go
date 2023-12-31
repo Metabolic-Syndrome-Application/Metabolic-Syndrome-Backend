@@ -19,5 +19,6 @@ func (sc *ScreeningRouteController) ScreeningRoute(rg *gin.RouterGroup) {
 	router := rg.Group("screening")
 	router.POST("/metabolic", middleware.DeserializeUser(), sc.screeningController.MetabolicRisk)
 	router.POST("/disease", middleware.DeserializeUser(), sc.screeningController.DiseaseRisk)
+	router.GET("/disease", middleware.DeserializeUser(), sc.screeningController.GetDiseaseRisk)
 
 }

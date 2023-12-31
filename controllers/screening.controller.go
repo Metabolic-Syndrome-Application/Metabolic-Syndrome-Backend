@@ -298,3 +298,14 @@ func (sc *ScreeningController) DiseaseRisk(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"diseaseRisk": ProfilePatient.DiseaseRisk}})
 }
+
+func (sc *ScreeningController) GetDiseaseRisk(ctx *gin.Context) {
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	var ProfilePatient models.Patient
+	result := sc.DB.First(&ProfilePatient, "id = ?", currentUser.ID)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No post with that title exists"})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"diseaseRisk": ProfilePatient.DiseaseRisk}})
+}
