@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -110,11 +111,7 @@ func (sc *ScreeningController) MetabolicRisk(ctx *gin.Context) {
 		return
 	}
 
-	//init the loc
-	loc, _ := time.LoadLocation("Asia/Bangkok")
-
-	//set timezone,
-	now := time.Now().In(loc)
+	now := time.Now()
 	newRecordHealth := &models.RecordHealth{
 		PatientId:              ProfilePatient.ID,
 		Height:                 payload.Height,
@@ -129,6 +126,7 @@ func (sc *ScreeningController) MetabolicRisk(ctx *gin.Context) {
 		RecordBy:               currentUser.Role,
 		Timestamp:              now,
 	}
+	fmt.Println("time:", now)
 	result3 := sc.DB.Create(&newRecordHealth)
 
 	if result3.Error != nil {
@@ -234,6 +232,7 @@ func (sc *ScreeningController) DiseaseRisk(ctx *gin.Context) {
 
 	}
 
+	//screening Hyperlipidemia
 	calHyperlipidemia := func() string {
 		countHyperlipidemia := 0
 		if RecordHealthPatient.HDL >= 60 {
@@ -261,12 +260,35 @@ func (sc *ScreeningController) DiseaseRisk(ctx *gin.Context) {
 
 	}
 
+	//screening Hypertension
+	calHypertension := func() string {
+		if RecordHealthPatient.SystolicBloodPressure < 130 && RecordHealthPatient.DiastolicBloodPressure < 85 {
+			return "low"
+		} else if (RecordHealthPatient.SystolicBloodPressure >= 130 && RecordHealthPatient.SystolicBloodPressure < 140) || (RecordHealthPatient.DiastolicBloodPressure >= 85 && RecordHealthPatient.DiastolicBloodPressure < 90) {
+			return "medium"
+		} else {
+			return "high"
+		}
+	}
+
+	//screening Obesity
+	calObesity := func() string {
+		bmi := RecordHealthPatient.Weight / (float32(RecordHealthPatient.Height) / 100)
+		if bmi < 23 {
+			return "low"
+		} else if bmi < 25 {
+			return "medium"
+		} else {
+			return "high"
+		}
+	}
+
 	updateDiseaseRisk := &models.Patient{
 		DiseaseRisk: models.DiseaseRisk{
 			Diabetes:       calDiabetes(),
 			Hyperlipidemia: calHyperlipidemia(),
-			Hypertension:   "metabolic",
-			Obesity:        "metabolic"},
+			Hypertension:   calHypertension(),
+			Obesity:        calObesity()},
 	}
 	a := sc.DB.Model(&ProfilePatient).Updates(updateDiseaseRisk)
 	if a.Error != nil {

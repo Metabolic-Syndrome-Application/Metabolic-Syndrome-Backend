@@ -223,6 +223,7 @@ func (uc *UserController) GetAllUserProfile(ctx *gin.Context) {
 		}
 		type Response struct {
 			ID         uuid.UUID `json:"id"`
+			Username   string    `gorm:"type:varchar(255);not null"`
 			Prefix     string    `json:"prefix,omitempty"`
 			FirstName  string    `json:"firstName,omitempty"`
 			LastName   string    `json:"lastName,omitempty"`
@@ -235,6 +236,7 @@ func (uc *UserController) GetAllUserProfile(ctx *gin.Context) {
 		for _, doctor := range doctors {
 			response := Response{
 				ID:         doctor.ID,
+				Username:   doctor.Username,
 				Prefix:     doctor.Prefix,
 				FirstName:  doctor.FirstName,
 				LastName:   doctor.LastName,
@@ -248,6 +250,7 @@ func (uc *UserController) GetAllUserProfile(ctx *gin.Context) {
 		for _, staff := range staffs {
 			response := Response{
 				ID:         staff.ID,
+				Username:   staff.Username,
 				Prefix:     staff.Prefix,
 				FirstName:  staff.FirstName,
 				LastName:   staff.LastName,

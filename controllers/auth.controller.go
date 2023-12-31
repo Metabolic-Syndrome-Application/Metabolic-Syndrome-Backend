@@ -105,7 +105,8 @@ func (ac *AuthController) SignUpUser(ctx *gin.Context) {
 		}
 	} else if newUser.Role == "doctor" {
 		newDoctor := &models.Doctor{
-			ID: newUser.ID,
+			ID:       newUser.ID,
+			Username: newUser.Username,
 		}
 		a := ac.DB.Create(&newDoctor)
 		if a.Error != nil {
@@ -115,7 +116,8 @@ func (ac *AuthController) SignUpUser(ctx *gin.Context) {
 		}
 	} else if newUser.Role == "staff" {
 		newStaff := &models.Staff{
-			ID: newUser.ID,
+			ID:       newUser.ID,
+			Username: newUser.Username,
 		}
 		a := ac.DB.Create(&newStaff)
 		if a.Error != nil {
