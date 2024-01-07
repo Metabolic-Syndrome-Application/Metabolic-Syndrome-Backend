@@ -6,7 +6,11 @@ services:
       - 6500:5432
     env_file:
       - ./app.env
+    environment:
+      TZ: 'Asia/Bangkok'
+      PGTZ: 'Asia/Bangkok'
     volumes:
+      - ./path/to/postgresql.conf:/etc/postgresql/postgresql.conf
       - postgres:/var/lib/postgresql/data
 volumes:
   postgres:

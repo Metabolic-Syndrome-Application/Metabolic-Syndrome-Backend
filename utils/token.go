@@ -19,7 +19,7 @@ func CreateToken(ttl time.Duration, payload interface{}, privateKey string) (str
 		return "", fmt.Errorf("create: parse key: %w", err)
 	}
 
-	now := time.Now().UTC()
+	now := time.Now()
 
 	claims := make(jwt.MapClaims)
 	claims["sub"] = payload

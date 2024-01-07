@@ -31,6 +31,7 @@ type Doctor struct {
 	Gender     string    `json:"gender,omitempty"`
 	Department string    `json:"department,omitempty"`
 	Specialist string    `json:"specialist,omitempty"`
+	UpdatedAt  time.Time
 }
 
 func (Doctor) TableName() string {
@@ -46,6 +47,7 @@ type Staff struct {
 	Gender     string    `json:"gender,omitempty"`
 	Department string    `json:"department,omitempty"`
 	Specialist string    `json:"specialist,omitempty"`
+	UpdatedAt  time.Time
 }
 
 func (Staff) TableName() string {
@@ -73,6 +75,7 @@ type Patient struct {
 	Challenge          Challenge   `gorm:"foreignKey:ChallengeID;" json:"challenge,omitempty"`
 	CollectPoints      int         `json:"collectPoints,omitempty"`
 	Status             string      `gorm:"default:'in process' " json:"status,omitempty"`
+	UpdatedAt          time.Time
 }
 type DiseaseRisk struct {
 	Diabetes       string `json:"diabetes"`
@@ -93,7 +96,8 @@ func (Patient) TableName() string {
 }
 
 type Plan struct {
-	PlanID uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
+	PlanID    uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
+	UpdatedAt time.Time
 }
 
 func (Plan) TableName() string {
@@ -102,6 +106,7 @@ func (Plan) TableName() string {
 
 type Challenge struct {
 	ChallengeID uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
+	UpdatedAt   time.Time
 }
 
 func (Challenge) TableName() string {
