@@ -290,6 +290,7 @@ func (sc *ScreeningController) DiseaseRisk(ctx *gin.Context) {
 			Hypertension:   calHypertension(),
 			Obesity:        calObesity()},
 	}
+
 	a := sc.DB.Model(&ProfilePatient).Updates(updateDiseaseRisk)
 	if a.Error != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update DiseaseRisk"})

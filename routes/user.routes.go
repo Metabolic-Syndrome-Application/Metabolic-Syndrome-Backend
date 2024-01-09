@@ -17,13 +17,13 @@ func NewUserRouteController(userController controllers.UserController) UserRoute
 func (uc *UserRouteController) UserRoute(rg *gin.RouterGroup) {
 
 	router := rg.Group("user")
-	router.GET("/profile", middleware.DeserializeUser(), uc.userController.GetProfile)     // get profile me
-	router.POST("/profile", middleware.DeserializeUser(), uc.userController.UpdateProfile) // post profile me
+	router.GET("/profile", middleware.DeserializeUser(), uc.userController.GetProfile)    // get profile me
+	router.PUT("/profile", middleware.DeserializeUser(), uc.userController.UpdateProfile) // post profile me
 
 	router.GET("/profile/all", middleware.DeserializeUser(), uc.userController.GetAllUserProfile) // get profile all (depend on currentUser.Role)
 
-	router.POST("/profile/:role/:id", middleware.DeserializeUser(), uc.userController.PostOtherProfile) // post profile other profile
-	router.GET("/profile/:role/:id", middleware.DeserializeUser(), uc.userController.GetOtherProfile)   // get profile other profile
-	router.DELETE("/profile/:role/:id", middleware.DeserializeUser(), uc.userController.DeleteUser)     // delete user
+	router.PUT("/profile/:role/:id", middleware.DeserializeUser(), uc.userController.UpdateOtherProfile) // post profile other profile
+	router.GET("/profile/:role/:id", middleware.DeserializeUser(), uc.userController.GetOtherProfile)    // get profile other profile
+	router.DELETE("/profile/:role/:id", middleware.DeserializeUser(), uc.userController.DeleteUser)      // delete user
 
 }

@@ -72,22 +72,13 @@ func (ac *AuthController) SignUpUser(ctx *gin.Context) {
 		UpdatedAt: now,
 	}
 
-	// hash 13 number
-	// if !strings.Contains(payload.Username, "@") {
-	// 	fmt.Println("hash")
-	// 	hashedUsername, err := utils.HashPassword(strings.ToLower(payload.Username))
-	// 	if err != nil {
-	// 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": err.Error()})
-	// 		return
-	// 	}
-	// 	newUser.Username = hashedUsername
-	// } else {
-	// 	newUser.Username = strings.ToLower(payload.Username)
-	// 	fmt.Println("not hash")
-	// }
+	if !strings.Contains(payload.Username, "@") {
+		newUser.Type = "email"
+	} else {
+		newUser.Type = "ID card number"
+	}
 
 	newUser.Username = strings.ToLower(payload.Username)
-	fmt.Println("not hash")
 
 	// สร้าง db User
 	result := ac.DB.Create(&newUser)

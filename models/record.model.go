@@ -26,5 +26,5 @@ type RecordHealth struct {
 }
 
 func (RecordHealth) TableName() string {
-	return "record health"
+	return "recordHealth"
 }

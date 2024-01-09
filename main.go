@@ -18,6 +18,8 @@ var (
 	UserRouteController      routes.UserRouteController
 	ScreeningController      controllers.ScreeningController
 	ScreeningRouteController routes.ScreeningRouteController
+	PlanController           controllers.PlanController
+	PlanRouteController      routes.PlanRouteController
 )
 
 func init() {
@@ -36,6 +38,9 @@ func init() {
 
 	ScreeningController = controllers.NewScreeningController(initializers.DB)
 	ScreeningRouteController = routes.NewScreeningRouteController(ScreeningController)
+
+	PlanController = controllers.NewPlanController(initializers.DB)
+	PlanRouteController = routes.NewPlanRouteController(PlanController)
 
 	server = gin.Default()
 }
@@ -60,5 +65,6 @@ func main() {
 	AuthRouteController.AuthRoute(router)
 	UserRouteController.UserRoute(router)
 	ScreeningRouteController.ScreeningRoute(router)
+	PlanRouteController.PlanRoute(router)
 	log.Fatal(server.Run(":" + config.ServerPort))
 }

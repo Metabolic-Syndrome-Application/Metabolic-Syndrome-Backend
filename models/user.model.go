@@ -14,6 +14,7 @@ type User struct {
 	Password  string    `gorm:"not null"`
 	Role      string    `gorm:"type:varchar(255);not null"`
 	Verified  bool      `gorm:"not null"`
+	Type      string    `gorm:"not null"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -93,15 +94,6 @@ func (dr *DiseaseRisk) Scan(value interface{}) error {
 
 func (Patient) TableName() string {
 	return "patient"
-}
-
-type Plan struct {
-	PlanID    uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
-	UpdatedAt time.Time
-}
-
-func (Plan) TableName() string {
-	return "plan"
 }
 
 type Challenge struct {

@@ -303,7 +303,7 @@ func (uc *UserController) GetAllUserProfile(ctx *gin.Context) {
 
 // update and create profile other user
 
-func (uc *UserController) PostOtherProfile(ctx *gin.Context) {
+func (uc *UserController) UpdateOtherProfile(ctx *gin.Context) {
 	userRole := ctx.Param("role")
 	userID := ctx.Param("id")
 
