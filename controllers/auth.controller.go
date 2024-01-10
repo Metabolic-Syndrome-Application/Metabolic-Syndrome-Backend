@@ -73,9 +73,9 @@ func (ac *AuthController) SignUpUser(ctx *gin.Context) {
 	}
 
 	if !strings.Contains(payload.Username, "@") {
-		newUser.Type = "email"
-	} else {
 		newUser.Type = "ID card number"
+	} else {
+		newUser.Type = "email"
 	}
 
 	newUser.Username = strings.ToLower(payload.Username)
