@@ -147,7 +147,7 @@ func (sc *ScreeningController) DiseaseRisk(ctx *gin.Context) {
 		return
 	}
 	var RecordHealthPatient models.RecordHealth
-	result2 := sc.DB.First(&RecordHealthPatient, "patient_id = ?", currentUser.ID)
+	result2 := sc.DB.Order("timestamp DESC").First(&RecordHealthPatient, "patient_id = ?", currentUser.ID)
 	if result2.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No post with that title exists"})
 		return
