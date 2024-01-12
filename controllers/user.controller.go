@@ -183,7 +183,7 @@ func (uc *UserController) GetAllUserProfile(ctx *gin.Context) {
 		var patients []models.Patient
 		result := uc.DB.Where("hn IS NOT NULL AND hn != ''").Find(&patients)
 		if result.Error != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "fail", "message": "Error fetching patient data"})
+			ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Error fetching patient data"})
 			return
 		}
 		type Response struct {
@@ -218,7 +218,7 @@ func (uc *UserController) GetAllUserProfile(ctx *gin.Context) {
 		var staffs []models.Staff
 		result2 := uc.DB.Find(&staffs)
 		if result1.Error != nil || result2.Error != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "fail", "message": "Error fetching patient data"})
+			ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Error fetching patient data"})
 			return
 		}
 		type Response struct {
@@ -267,7 +267,7 @@ func (uc *UserController) GetAllUserProfile(ctx *gin.Context) {
 		var patients []models.Patient
 		result := uc.DB.Where("main_doctor_id = ? AND hn IS NOT NULL AND hn != ''", currentUser.ID).Find(&patients)
 		if result.Error != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "fail", "message": "Error fetching patient data"})
+			ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Error fetching doctor data"})
 			return
 		}
 		type Response struct {
@@ -470,28 +470,28 @@ func (uc *UserController) GetOtherProfile(ctx *gin.Context) {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this role"})
 	}
 }
-func (pc *UserController) DeleteUser(ctx *gin.Context) {
+func (uc *UserController) DeleteUser(ctx *gin.Context) {
 	userRole := ctx.Param("role")
 	userID := ctx.Param("id")
-	result := pc.DB.Delete(&models.User{}, "id = ?", userID)
+	result := uc.DB.Delete(&models.User{}, "id = ?", userID)
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No user with that title exists"})
 		return
 	}
 	if userRole == "patient" {
-		result := pc.DB.Delete(&models.Patient{}, "id = ?", userID)
+		result := uc.DB.Delete(&models.Patient{}, "id = ?", userID)
 		if result.Error != nil {
 			ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No user with that title exists"})
 			return
 		}
 	} else if userRole == "doctor" {
-		result := pc.DB.Delete(&models.Doctor{}, "id = ?", userID)
+		result := uc.DB.Delete(&models.Doctor{}, "id = ?", userID)
 		if result.Error != nil {
 			ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No user with that title exists"})
 			return
 		}
 	} else if userRole == "staff" {
-		result := pc.DB.Delete(&models.Staff{}, "id = ?", userID)
+		result := uc.DB.Delete(&models.Staff{}, "id = ?", userID)
 		if result.Error != nil {
 			ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No user with that title exists"})
 			return

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/ployns/Metabolic-Syndrome-Backend/models"
 	"gorm.io/gorm"
 )
@@ -146,10 +147,37 @@ func (pc *PlanController) GetPlan(ctx *gin.Context) {
 
 // Get all plan
 func (pc *PlanController) GetAllPlan(ctx *gin.Context) {
-
+	var plans []models.Plan
+	result := pc.DB.Find(&plans)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "not have plan data"})
+		return
+	}
+	type Response struct {
+		ID          uuid.UUID `json:"id"`
+		Name        string    `json:"name,omitempty"`
+		DiseaseRisk string    `json:"diseaseRisk,omitempty"`
+	}
+	var data []Response
+	for _, plan := range plans {
+		response := Response{
+			ID:          plan.ID,
+			Name:        plan.Name,
+			DiseaseRisk: plan.DiseaseRisk,
+		}
+		data = append(data, response)
+	}
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"plan": data}})
 }
 
 // Delete plan
 func (pc *PlanController) DeletePlan(ctx *gin.Context) {
+	planID := ctx.Param("id")
+	result := pc.DB.Delete(&models.Plan{}, "id = ?", planID)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No user with that title exists"})
+		return
+	}
 
+	ctx.JSON(http.StatusOK, gin.H{"status": "success"})
 }

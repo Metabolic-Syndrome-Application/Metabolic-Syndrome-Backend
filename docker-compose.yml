@@ -10,7 +10,6 @@ services:
       TZ: 'Asia/Bangkok'
       PGTZ: 'Asia/Bangkok'
     volumes:
-      - ./path/to/postgresql.conf:/etc/postgresql/postgresql.conf
       - postgres:/var/lib/postgresql/data
 volumes:
   postgres:
