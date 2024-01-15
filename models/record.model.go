@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/google/uuid"
@@ -8,8 +9,8 @@ import (
 
 type RecordHealth struct {
 	ID                     uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`
-	PatientId              uuid.UUID `gorm:"type:uuid ;null" json:"patientId,omitempty"`
-	Patient                Patient   `gorm:"foreignKey:PatientId; " json:"patient,omitempty"`
+	PatientID              uuid.UUID `gorm:"type:uuid ;null" json:"patientID,omitempty"`
+	Patient                Patient   `gorm:"foreignKey:PatientID; " json:"patient,omitempty"`
 	Height                 float32   `json:"height,omitempty"`
 	Weight                 float32   `json:"weight,omitempty"`
 	Waistline              float32   `json:"waistline,omitempty"`
@@ -28,3 +29,4 @@ type RecordHealth struct {
 func (RecordHealth) TableName() string {
 	return "recordHealth"
 }
+

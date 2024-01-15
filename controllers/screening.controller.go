@@ -113,7 +113,7 @@ func (sc *ScreeningController) MetabolicRisk(ctx *gin.Context) {
 
 	now := time.Now()
 	newRecordHealth := &models.RecordHealth{
-		PatientId:              ProfilePatient.ID,
+		PatientID:              ProfilePatient.ID,
 		Height:                 payload.Height,
 		Weight:                 payload.Weight,
 		Waistline:              payload.Waistline,

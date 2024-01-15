@@ -65,10 +65,10 @@ type Patient struct {
 	Gender             string      `json:"gender,omitempty"`
 	Occupation         string      `json:"occupation,omitempty"`
 	Photo              string      `json:"photo,omitempty"`
-	MainDoctorId       *uuid.UUID  `gorm:"type:uuid ;null" json:"mainDoctorId,omitempty"`
-	MainDoctor         Doctor      `gorm:"foreignKey:MainDoctorId; " json:"mainDoctor,omitempty"`
-	AssistanceDoctorId *uuid.UUID  `gorm:"type:uuid ;null" json:"assistanceDoctorId,omitempty"`
-	AssistanceDoctor   Doctor      `gorm:"foreignKey:AssistanceDoctorId;" json:"assistanceDoctor,omitempty"`
+	MainDoctorID       *uuid.UUID  `gorm:"type:uuid ;null" json:"mainDoctorID,omitempty"`
+	MainDoctor         Doctor      `gorm:"foreignKey:MainDoctorID; " json:"mainDoctor,omitempty"`
+	AssistanceDoctorID *uuid.UUID  `gorm:"type:uuid ;null" json:"assistanceDoctorID,omitempty"`
+	AssistanceDoctor   Doctor      `gorm:"foreignKey:AssistanceDoctorID;" json:"assistanceDoctor,omitempty"`
 	DiseaseRisk        DiseaseRisk `gorm:"type:jsonb" json:"diseaseRisk,omitempty"`
 	PlanID             *uuid.UUID  `gorm:"type:uuid ;null" json:"planID,omitempty"`
 	Plan               Plan        `gorm:"foreignKey:PlanID;" json:"plan,omitempty"`

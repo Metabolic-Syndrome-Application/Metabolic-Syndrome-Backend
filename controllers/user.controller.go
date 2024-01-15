@@ -31,7 +31,7 @@ func (uc *UserController) UpdateProfile(ctx *gin.Context) {
 			YearOfBirth  int        `json:"yearOfBirth,omitempty"`
 			Gender       string     `json:"gender,omitempty"`
 			Photo        string     `json:"photo,omitempty"`
-			MainDoctorId *uuid.UUID `gorm:"type:uuid ;null" json:"mainDoctorId,omitempty"`
+			MainDoctorID *uuid.UUID `gorm:"type:uuid ;null" json:"mainDoctorID,omitempty"`
 		}{} // {} = default is null
 		if err := ctx.ShouldBindJSON(&payload); err != nil {
 			ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
@@ -50,7 +50,7 @@ func (uc *UserController) UpdateProfile(ctx *gin.Context) {
 			YearOfBirth:  payload.YearOfBirth,
 			Gender:       payload.Gender,
 			Photo:        payload.Photo,
-			MainDoctorId: payload.MainDoctorId,
+			MainDoctorID: payload.MainDoctorID,
 		}
 
 		a := uc.DB.Model(&updateProfilePatient).Updates(updatePatient)
@@ -142,7 +142,11 @@ func (uc *UserController) GetProfile(ctx *gin.Context) {
 
 	if currentUser.Role == "patient" {
 		var GetProfilePatient models.Patient
-		result := uc.DB.First(&GetProfilePatient, "id = ?", currentUser.ID)
+		result := uc.DB.Preload("Plan").
+			Preload("MainDoctor").
+			Preload("AssistanceDoctor").
+			Preload("Challenge").
+			First(&GetProfilePatient, "id = ?", currentUser.ID)
 		if result.Error != nil {
 			ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
 			return
@@ -194,7 +198,7 @@ func (uc *UserController) GetAllUserProfile(ctx *gin.Context) {
 			Gender       string     `json:"gender,omitempty"`
 			YearOfBirth  int        `json:"yearOfBirth,omitempty"`
 			Status       string     `json:"status,omitempty"`
-			MainDoctorId *uuid.UUID `gorm:"type:uuid ;null" json:"mainDoctorId,omitempty"` //TODO:ใส่เป็นชื่อหมอ
+			MainDoctorID *uuid.UUID `gorm:"type:uuid ;null" json:"mainDoctorID,omitempty"` //TODO:ใส่เป็นชื่อหมอ
 		}
 		var data []Response
 		for _, patient := range patients {
@@ -206,7 +210,7 @@ func (uc *UserController) GetAllUserProfile(ctx *gin.Context) {
 				Gender:       patient.Gender,
 				YearOfBirth:  patient.YearOfBirth,
 				Status:       patient.Status,
-				MainDoctorId: patient.MainDoctorId,
+				MainDoctorID: patient.MainDoctorID,
 			}
 			data = append(data, response)
 		}
@@ -278,7 +282,7 @@ func (uc *UserController) GetAllUserProfile(ctx *gin.Context) {
 			Gender       string     `json:"gender,omitempty"`
 			YearOfBirth  int        `json:"yearOfBirth,omitempty"`
 			Status       string     `json:"status,omitempty"`
-			MainDoctorId *uuid.UUID `gorm:"type:uuid ;null" json:"mainDoctorId,omitempty"` //TODO:ใส่เป็นชื่อหมอ
+			MainDoctorID *uuid.UUID `gorm:"type:uuid ;null" json:"mainDoctorID,omitempty"` //TODO:ใส่เป็นชื่อหมอ
 		}
 		var data []Response
 		for _, patient := range patients {
@@ -290,7 +294,7 @@ func (uc *UserController) GetAllUserProfile(ctx *gin.Context) {
 				Gender:       patient.Gender,
 				YearOfBirth:  patient.YearOfBirth,
 				Status:       patient.Status,
-				MainDoctorId: patient.MainDoctorId,
+				MainDoctorID: patient.MainDoctorID,
 			}
 			data = append(data, response)
 		}
@@ -322,8 +326,8 @@ func (uc *UserController) UpdateOtherProfile(ctx *gin.Context) {
 			LastName           string     `json:"lastName,omitempty"`
 			YearOfBirth        int        `json:"yearOfBirth,omitempty"`
 			Gender             string     `json:"gender,omitempty"`
-			MainDoctorId       *uuid.UUID `gorm:"type:uuid ;null" json:"mainDoctorId,omitempty"`
-			AssistanceDoctorId *uuid.UUID `gorm:"type:uuid ;null" json:"assistanceDoctorId,omitempty"`
+			MainDoctorID       *uuid.UUID `gorm:"type:uuid ;null" json:"mainDoctorID,omitempty"`
+			AssistanceDoctorID *uuid.UUID `gorm:"type:uuid ;null" json:"assistanceDoctorID,omitempty"`
 			DiseaseRisk        struct {
 				Diabetes       string `json:"diabetes"`
 				Hyperlipidemia string `json:"hyperlipidemia"`
@@ -343,8 +347,8 @@ func (uc *UserController) UpdateOtherProfile(ctx *gin.Context) {
 			LastName:           payload.LastName,
 			YearOfBirth:        payload.YearOfBirth,
 			Gender:             payload.Gender,
-			MainDoctorId:       payload.MainDoctorId,
-			AssistanceDoctorId: payload.AssistanceDoctorId,
+			MainDoctorID:       payload.MainDoctorID,
+			AssistanceDoctorID: payload.AssistanceDoctorID,
 			DiseaseRisk:        payload.DiseaseRisk,
 			PlanID:             payload.PlanID,
 			Status:             payload.Status,
@@ -439,7 +443,13 @@ func (uc *UserController) GetOtherProfile(ctx *gin.Context) {
 	userID := ctx.Param("id")
 	if userRole == "patient" {
 		var GetProfilePatient models.Patient
-		result := uc.DB.First(&GetProfilePatient, "id = ?", userID)
+		result := uc.DB.Preload("Plan").
+			Preload("MainDoctor").
+			Preload("AssistanceDoctor").
+			Preload("Challenge").
+			First(&GetProfilePatient, "id = ?", userID)
+
+		// result := uc.DB.First(&GetProfilePatient, "id = ?", userID)
 		if result.Error != nil {
 			ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
 			return
