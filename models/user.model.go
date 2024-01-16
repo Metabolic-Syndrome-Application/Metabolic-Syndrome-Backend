@@ -10,13 +10,13 @@ import (
 
 type User struct {
 	ID        uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`
-	Username  string    `gorm:"type:varchar(255);not null"`
+	Username  string    `gorm:"type:varchar(255);not null" json:"username"`
 	Password  string    `gorm:"not null"`
-	Role      string    `gorm:"type:varchar(255);not null"`
-	Verified  bool      `gorm:"not null"`
-	Type      string    `gorm:"not null"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	Role      string    `gorm:"type:varchar(255);not null" json:"role"`
+	Verified  bool      `gorm:"not null" json:"verified"`
+	Type      string    `gorm:"not null" json:"type"`
+	CreatedAt time.Time `json:"createAt"`
+	UpdatedAt time.Time `json:"updateAt"`
 }
 
 func (User) TableName() string {
@@ -25,14 +25,14 @@ func (User) TableName() string {
 
 type Doctor struct {
 	ID         uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
-	Username   string    `gorm:"type:varchar(255);not null"`
+	Username   string    `gorm:"type:varchar(255);not null" json:"username"`
 	Prefix     string    `json:"prefix,omitempty"`
 	FirstName  string    `json:"firstName,omitempty"`
 	LastName   string    `json:"lastName,omitempty"`
 	Gender     string    `json:"gender,omitempty"`
 	Department string    `json:"department,omitempty"`
 	Specialist string    `json:"specialist,omitempty"`
-	UpdatedAt  time.Time
+	UpdatedAt  time.Time `json:"updateAt"`
 }
 
 func (Doctor) TableName() string {
@@ -41,14 +41,14 @@ func (Doctor) TableName() string {
 
 type Staff struct {
 	ID         uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
-	Username   string    `gorm:"type:varchar(255);not null"`
+	Username   string    `gorm:"type:varchar(255);not null" json:"username"`
 	Prefix     string    `json:"prefix,omitempty"`
 	FirstName  string    `json:"firstName,omitempty"`
 	LastName   string    `json:"lastName,omitempty"`
 	Gender     string    `json:"gender,omitempty"`
 	Department string    `json:"department,omitempty"`
 	Specialist string    `json:"specialist,omitempty"`
-	UpdatedAt  time.Time
+	UpdatedAt  time.Time `json:"updateAt"`
 }
 
 func (Staff) TableName() string {
@@ -76,7 +76,7 @@ type Patient struct {
 	Challenge          Challenge   `gorm:"foreignKey:ChallengeID;" json:"challenge,omitempty"`
 	CollectPoints      int         `json:"collectPoints,omitempty"`
 	Status             string      `gorm:"default:'in process' " json:"status,omitempty"`
-	UpdatedAt          time.Time
+	UpdatedAt          time.Time   `json:"updateAt"`
 }
 type DiseaseRisk struct {
 	Diabetes       string `json:"diabetes"`
@@ -98,7 +98,7 @@ func (Patient) TableName() string {
 
 type Challenge struct {
 	ChallengeID uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
-	UpdatedAt   time.Time
+	UpdatedAt   time.Time `json:"updateAt"`
 }
 
 func (Challenge) TableName() string {
@@ -119,7 +119,7 @@ type SignInInput struct {
 
 type UserResponse struct {
 	ID        uuid.UUID `json:"id,omitempty"`
-	Username  string    `gorm:"type:varchar(255);not null"`
+	Username  string    `gorm:"type:varchar(255);not null" json:"username"`
 	Role      string    `json:"role,omitempty"`
 	Photo     string    `json:"photo,omitempty"`
 	CreatedAt time.Time `json:"created_at"`

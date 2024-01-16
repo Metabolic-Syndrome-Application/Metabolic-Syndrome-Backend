@@ -227,14 +227,14 @@ func (uc *UserController) GetAllUserProfile(ctx *gin.Context) {
 		}
 		type Response struct {
 			ID         uuid.UUID `json:"id"`
-			Username   string    `gorm:"type:varchar(255);not null"`
+			Username   string    `gorm:"type:varchar(255);not null" json:"username"`
 			Prefix     string    `json:"prefix,omitempty"`
 			FirstName  string    `json:"firstName,omitempty"`
 			LastName   string    `json:"lastName,omitempty"`
 			Gender     string    `json:"gender,omitempty"`
 			Department string    `json:"department,omitempty"`
 			Specialist string    `json:"specialist,omitempty"`
-			Role       string    `gorm:"type:varchar(255);not null"`
+			Role       string    `gorm:"type:varchar(255);not null" json:"role"`
 		}
 		var data []Response
 		for _, doctor := range doctors {

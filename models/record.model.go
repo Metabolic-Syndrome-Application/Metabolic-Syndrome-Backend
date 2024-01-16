@@ -8,7 +8,7 @@ import (
 )
 
 type RecordHealth struct {
-	ID                     uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`
+	ID                     uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
 	PatientID              uuid.UUID `gorm:"type:uuid ;null" json:"patientID,omitempty"`
 	Patient                Patient   `gorm:"foreignKey:PatientID; " json:"patient,omitempty"`
 	Height                 float32   `json:"height,omitempty"`
@@ -31,7 +31,7 @@ func (RecordHealth) TableName() string {
 }
 
 type RecordPlan struct {
-	ID        uuid.UUID       `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`
+	ID        uuid.UUID       `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
 	PatientID uuid.UUID       `gorm:"type:uuid ;null" json:"patientID,omitempty"`
 	Patient   Patient         `gorm:"foreignKey:PatientID; " json:"patient,omitempty"`
 	Detail    json.RawMessage `gorm:"type:jsonb" json:"detail,omitempty"`
