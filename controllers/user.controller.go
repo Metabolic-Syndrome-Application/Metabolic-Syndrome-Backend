@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 	"github.com/ployns/Metabolic-Syndrome-Backend/models"
 	"gorm.io/gorm"
 )
@@ -315,49 +316,55 @@ func (uc *UserController) UpdateOtherProfile(ctx *gin.Context) {
 
 	if userRole == "patient" {
 		var patient models.Patient
-		result := uc.DB.First(&patient, "id = ?", userID)
+		result := uc.DB.Preload("Plan").Find(&patient, "id = ?", userID).Scan(&patient)
 		if result.Error != nil {
 			ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
 			return
 		}
+
 		var payload = struct {
 			HN                 string     `json:"hn,omitempty"`
 			FirstName          string     `json:"firstName,omitempty"`
 			LastName           string     `json:"lastName,omitempty"`
 			YearOfBirth        int        `json:"yearOfBirth,omitempty"`
 			Gender             string     `json:"gender,omitempty"`
-			MainDoctorID       *uuid.UUID `gorm:"type:uuid ;null" json:"mainDoctorID,omitempty"`
-			AssistanceDoctorID *uuid.UUID `gorm:"type:uuid ;null" json:"assistanceDoctorID,omitempty"`
+			MainDoctorID       *uuid.UUID `gorm:"type:uuid;null" json:"mainDoctorID,omitempty"`
+			AssistanceDoctorID *uuid.UUID `gorm:"type:uuid;null" json:"assistanceDoctorID,omitempty"`
 			DiseaseRisk        struct {
 				Diabetes       string `json:"diabetes"`
 				Hyperlipidemia string `json:"hyperlipidemia"`
 				Hypertension   string `json:"hypertension"`
 				Obesity        string `json:"obesity"`
 			} `json:"diseaseRisk"`
-			PlanID *uuid.UUID `gorm:"type:uuid ;null" json:"planID,omitempty"`
-			Status string     `gorm:"default:'in process' " json:"status,omitempty"`
-		}{} // {} = default is null
+			PlanID pq.StringArray `gorm:"type:uuid[];column:plan_id" json:"planID,omitempty"`
+			Status string         `gorm:"default:'in process'" json:"status,omitempty"`
+		}{}
+
 		if err := ctx.ShouldBindJSON(&payload); err != nil {
 			ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
 			return
 		}
-		updatePatient := &models.Patient{
-			HN:                 payload.HN,
-			FirstName:          payload.FirstName,
-			LastName:           payload.LastName,
-			YearOfBirth:        payload.YearOfBirth,
-			Gender:             payload.Gender,
-			MainDoctorID:       payload.MainDoctorID,
-			AssistanceDoctorID: payload.AssistanceDoctorID,
-			DiseaseRisk:        payload.DiseaseRisk,
-			PlanID:             payload.PlanID,
-			Status:             payload.Status,
+
+		updateData := map[string]interface{}{
+			"HN":                 payload.HN,
+			"FirstName":          payload.FirstName,
+			"LastName":           payload.LastName,
+			"YearOfBirth":        payload.YearOfBirth,
+			"Gender":             payload.Gender,
+			"MainDoctorID":       payload.MainDoctorID,
+			"AssistanceDoctorID": payload.AssistanceDoctorID,
+			"DiseaseRisk":        payload.DiseaseRisk,
+			"PlanID":             payload.PlanID,
+			"Status":             payload.Status,
 		}
-		a := uc.DB.Model(&patient).Updates(updatePatient)
-		if a.Error != nil {
+
+		result = uc.DB.Model(&patient).Updates(updateData)
+
+		if result.Error != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update profile patient"})
 			return
 		}
+
 		ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Update profile patient success"})
 
 		// update and create profile role doctor
@@ -443,17 +450,17 @@ func (uc *UserController) GetOtherProfile(ctx *gin.Context) {
 	userID := ctx.Param("id")
 	if userRole == "patient" {
 		var GetProfilePatient models.Patient
+
 		result := uc.DB.Preload("Plan").
 			Preload("MainDoctor").
 			Preload("AssistanceDoctor").
 			Preload("Challenge").
 			First(&GetProfilePatient, "id = ?", userID)
-
-		// result := uc.DB.First(&GetProfilePatient, "id = ?", userID)
 		if result.Error != nil {
 			ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
 			return
 		}
+		// uc.DB.Model(&GetProfilePatient).Association("Plan").Find(&GetProfilePatient.Plan)
 
 		ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"user": GetProfilePatient}})
 

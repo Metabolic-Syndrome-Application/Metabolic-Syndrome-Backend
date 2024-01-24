@@ -84,10 +84,10 @@ func (sc *ScreeningController) MetabolicRisk(ctx *gin.Context) {
 
 		updateRisk := &models.Patient{
 			DiseaseRisk: models.DiseaseRisk{
-				Diabetes:       "metabolic",
-				Hyperlipidemia: "metabolic",
-				Hypertension:   "metabolic",
-				Obesity:        "metabolic"},
+				Diabetes:       "metabolicLow",
+				Hyperlipidemia: "metabolicLow",
+				Hypertension:   "metabolicLow",
+				Obesity:        "metabolicLow"},
 		}
 
 		result := sc.DB.Model(&ProfilePatient).Updates(updateRisk)
@@ -97,8 +97,34 @@ func (sc *ScreeningController) MetabolicRisk(ctx *gin.Context) {
 		}
 	} else if risk == 2 {
 		metabolicRisk = "medium"
+		updateRisk := &models.Patient{
+			DiseaseRisk: models.DiseaseRisk{
+				Diabetes:       "metabolicMedium",
+				Hyperlipidemia: "metabolicMedium",
+				Hypertension:   "metabolicMedium",
+				Obesity:        "metabolicMedium"},
+		}
+
+		result := sc.DB.Model(&ProfilePatient).Updates(updateRisk)
+		if result.Error != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update profile Staff"})
+			return
+		}
 	} else if risk >= 3 {
 		metabolicRisk = "high"
+		updateRisk := &models.Patient{
+			DiseaseRisk: models.DiseaseRisk{
+				Diabetes:       "metabolicHigh",
+				Hyperlipidemia: "metabolicHigh",
+				Hypertension:   "metabolicHigh",
+				Obesity:        "metabolicHigh"},
+		}
+
+		result := sc.DB.Model(&ProfilePatient).Updates(updateRisk)
+		if result.Error != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update profile Staff"})
+			return
+		}
 	}
 
 	// add data Occupation

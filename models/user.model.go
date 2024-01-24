@@ -1,11 +1,13 @@
 package models
 
 import (
+	"database/sql/driver"
 	"encoding/json"
 	"errors"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 )
 
 type User struct {
@@ -56,27 +58,27 @@ func (Staff) TableName() string {
 }
 
 type Patient struct {
-	ID                 uuid.UUID   `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
-	HN                 string      `json:"hn,omitempty"`
-	Alias              string      `json:"alias,omitempty"`
-	FirstName          string      `json:"firstName,omitempty"`
-	LastName           string      `json:"lastName,omitempty"`
-	YearOfBirth        int         `json:"yearOfBirth,omitempty"`
-	Gender             string      `json:"gender,omitempty"`
-	Occupation         string      `json:"occupation,omitempty"`
-	Photo              string      `json:"photo,omitempty"`
-	MainDoctorID       *uuid.UUID  `gorm:"type:uuid ;null" json:"mainDoctorID,omitempty"`
-	MainDoctor         Doctor      `gorm:"foreignKey:MainDoctorID; " json:"mainDoctor,omitempty"`
-	AssistanceDoctorID *uuid.UUID  `gorm:"type:uuid ;null" json:"assistanceDoctorID,omitempty"`
-	AssistanceDoctor   Doctor      `gorm:"foreignKey:AssistanceDoctorID;" json:"assistanceDoctor,omitempty"`
-	DiseaseRisk        DiseaseRisk `gorm:"type:jsonb" json:"diseaseRisk,omitempty"`
-	PlanID             *uuid.UUID  `gorm:"type:uuid ;null" json:"planID,omitempty"`
-	Plan               Plan        `gorm:"foreignKey:PlanID;" json:"plan,omitempty"`
-	ChallengeID        *uuid.UUID  `gorm:"type:uuid ;null" json:"challengeID,omitempty"`
-	Challenge          Challenge   `gorm:"foreignKey:ChallengeID;" json:"challenge,omitempty"`
-	CollectPoints      int         `json:"collectPoints,omitempty"`
-	Status             string      `gorm:"default:'in process' " json:"status,omitempty"`
-	UpdatedAt          time.Time   `json:"updateAt"`
+	ID                 uuid.UUID      `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
+	HN                 string         `json:"hn,omitempty"`
+	Alias              string         `json:"alias,omitempty"`
+	FirstName          string         `json:"firstName,omitempty"`
+	LastName           string         `json:"lastName,omitempty"`
+	YearOfBirth        int            `json:"yearOfBirth,omitempty"`
+	Gender             string         `json:"gender,omitempty"`
+	Occupation         string         `json:"occupation,omitempty"`
+	Photo              string         `json:"photo,omitempty"`
+	MainDoctorID       *uuid.UUID     `gorm:"type:uuid ;null" json:"mainDoctorID,omitempty"`
+	MainDoctor         Doctor         `gorm:"foreignKey:MainDoctorID; " json:"mainDoctor,omitempty"`
+	AssistanceDoctorID *uuid.UUID     `gorm:"type:uuid ;null" json:"assistanceDoctorID,omitempty"`
+	AssistanceDoctor   Doctor         `gorm:"foreignKey:AssistanceDoctorID;" json:"assistanceDoctor,omitempty"`
+	DiseaseRisk        DiseaseRisk    `gorm:"type:jsonb" json:"diseaseRisk,omitempty"`
+	PlanID             pq.StringArray `gorm:"type:uuid[];column:plan_id" json:"planID,omitempty"`
+	Plan               []Plan         `gorm:"many2many:patient_plans;association_foreignkey:plan_id;" json:"plan,omitempty"`
+	ChallengeID        *uuid.UUID     `gorm:"type:uuid ;null" json:"challengeID,omitempty"`
+	Challenge          Challenge      `gorm:"foreignKey:ChallengeID;" json:"challenge,omitempty"`
+	CollectPoints      int            `json:"collectPoints,omitempty"`
+	Status             string         `gorm:"default:'in process' " json:"status,omitempty"`
+	UpdatedAt          time.Time      `json:"updateAt"`
 }
 type DiseaseRisk struct {
 	Diabetes       string `json:"diabetes"`
@@ -90,6 +92,27 @@ func (dr *DiseaseRisk) Scan(value interface{}) error {
 		return json.Unmarshal(data, dr)
 	}
 	return errors.New("failed to unmarshal DiseaseRisk")
+}
+
+func (patient *Patient) Scan(value interface{}) error {
+	if value == nil {
+		return nil
+	}
+
+	switch v := value.(type) {
+	case pq.StringArray:
+		patient.PlanID = v
+		return nil
+	default:
+		return errors.New("unsupported type for PlanID")
+	}
+}
+
+func (patient *Patient) Value() (driver.Value, error) {
+	if patient.PlanID == nil {
+		return nil, nil
+	}
+	return patient.PlanID.Value()
 }
 
 func (Patient) TableName() string {
