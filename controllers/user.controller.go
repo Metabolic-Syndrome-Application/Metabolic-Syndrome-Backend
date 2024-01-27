@@ -345,20 +345,33 @@ func (uc *UserController) UpdateOtherProfile(ctx *gin.Context) {
 			return
 		}
 
-		updateData := map[string]interface{}{
-			"HN":                 payload.HN,
-			"FirstName":          payload.FirstName,
-			"LastName":           payload.LastName,
-			"YearOfBirth":        payload.YearOfBirth,
-			"Gender":             payload.Gender,
-			"MainDoctorID":       payload.MainDoctorID,
-			"AssistanceDoctorID": payload.AssistanceDoctorID,
-			"DiseaseRisk":        payload.DiseaseRisk,
-			"PlanID":             payload.PlanID,
-			"Status":             payload.Status,
+		// updateData := map[string]interface{}{
+		// 	"HN":                 payload.HN,
+		// 	"FirstName":          payload.FirstName,
+		// 	"LastName":           payload.LastName,
+		// 	"YearOfBirth":        payload.YearOfBirth,
+		// 	"Gender":             payload.Gender,
+		// 	"MainDoctorID":       payload.MainDoctorID,
+		// 	"AssistanceDoctorID": payload.AssistanceDoctorID,
+		// 	"DiseaseRisk":        payload.DiseaseRisk,
+		// 	"PlanID":             payload.PlanID,
+		// 	"Status":             payload.Status,
+		// }
+
+		updatePatient := &models.Patient{
+			HN:                 payload.HN,
+			FirstName:          payload.FirstName,
+			LastName:           payload.LastName,
+			YearOfBirth:        payload.YearOfBirth,
+			Gender:             payload.Gender,
+			MainDoctorID:       payload.MainDoctorID,
+			AssistanceDoctorID: payload.AssistanceDoctorID,
+			DiseaseRisk:        payload.DiseaseRisk,
+			PlanID:             payload.PlanID,
+			Status:             payload.Status,
 		}
 
-		result = uc.DB.Model(&patient).Updates(updateData)
+		result = uc.DB.Model(&patient).Updates(updatePatient)
 
 		if result.Error != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update profile patient"})

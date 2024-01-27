@@ -214,6 +214,13 @@ func (pc *PlanController) CreatePlan(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
 		return
 	}
+
+	var plan models.Plan
+	existingPlan := pc.DB.First(&plan, "name = ?", payload.Name)
+	if existingPlan.Error == nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "This plan's name is already in use"})
+		return
+	}
 	newPlan := models.Plan{
 		Name:        payload.Name,
 		Description: payload.Description,

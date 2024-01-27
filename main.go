@@ -20,6 +20,8 @@ var (
 	ScreeningRouteController routes.ScreeningRouteController
 	PlanController           controllers.PlanController
 	PlanRouteController      routes.PlanRouteController
+	RecordController         controllers.RecordController
+	RecordRouteController    routes.RecordRouteController
 )
 
 func init() {
@@ -41,6 +43,9 @@ func init() {
 
 	PlanController = controllers.NewPlanController(initializers.DB)
 	PlanRouteController = routes.NewPlanRouteController(PlanController)
+
+	RecordController = controllers.NewRecordController(initializers.DB)
+	RecordRouteController = routes.NewRecordRouteController(RecordController)
 
 	server = gin.Default()
 }
@@ -66,5 +71,6 @@ func main() {
 	UserRouteController.UserRoute(router)
 	ScreeningRouteController.ScreeningRoute(router)
 	PlanRouteController.PlanRoute(router)
+	RecordRouteController.RecordRoute(router)
 	log.Fatal(server.Run(":" + config.ServerPort))
 }
