@@ -53,7 +53,6 @@ import (
 
 type Plan struct {
 	ID          uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
-	Patients    []Patient `gorm:"many2many:patient_plans;association_foreignkey:plan_id;" json:"patients,omitempty"`
 	Name        string    `json:"name,omitempty"`
 	Description string    `json:"description,omitempty"`
 	Photo       string    `json:"photo,omitempty"`
@@ -64,7 +63,7 @@ type Plan struct {
 }
 
 type Detail struct {
-	Name string   `json:"name,omitempty"`
+	Name []string `json:"name,omitempty"`
 	Day  []string `json:"day,omitempty"`
 }
 

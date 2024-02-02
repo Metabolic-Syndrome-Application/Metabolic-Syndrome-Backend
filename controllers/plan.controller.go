@@ -257,13 +257,14 @@ func (pc *PlanController) UpdatePlan(ctx *gin.Context) {
 		return
 	}
 	updatePlan := models.Plan{
+		ID:          plan.ID,
 		Name:        payload.Name,
 		Description: payload.Description,
 		Photo:       payload.Photo,
 		Type:        payload.Type,
 		Detail:      payload.Detail,
 	}
-	if err := pc.DB.Model(&plan).Updates(updatePlan).Error; err != nil {
+	if err := pc.DB.Model(&plan).Save(updatePlan).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update plan"})
 		return
 	}

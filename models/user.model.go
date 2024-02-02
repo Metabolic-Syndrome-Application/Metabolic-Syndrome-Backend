@@ -73,7 +73,7 @@ type Patient struct {
 	AssistanceDoctor   Doctor         `gorm:"foreignKey:AssistanceDoctorID;" json:"assistanceDoctor,omitempty"`
 	DiseaseRisk        DiseaseRisk    `gorm:"type:jsonb" json:"diseaseRisk,omitempty"`
 	PlanID             pq.StringArray `gorm:"type:uuid[];column:plan_id" json:"planID,omitempty"`
-	Plan               []Plan         `gorm:"many2many:patient_plans;association_foreignkey:plan_id;" json:"plan,omitempty"`
+	Plan               []Plan         `gorm:"many2many:patient_plan;association_foreignkey:ID;joinForeignKey:PatientID;References:ID;joinReferences:PlanID" json:"Plan,omitempty"`
 	ChallengeID        *uuid.UUID     `gorm:"type:uuid ;null" json:"challengeID,omitempty"`
 	Challenge          Challenge      `gorm:"foreignKey:ChallengeID;" json:"challenge,omitempty"`
 	CollectPoints      int            `json:"collectPoints,omitempty"`

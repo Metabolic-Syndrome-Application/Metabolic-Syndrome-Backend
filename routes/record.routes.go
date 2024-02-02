@@ -19,5 +19,6 @@ func (rc *RecordRouteController) RecordRoute(rg *gin.RouterGroup) {
 	router := rg.Group("record")
 	router.POST("/health", middleware.DeserializeUser(), rc.recordController.RecordHealth)
 	router.POST("/health/:id", middleware.DeserializeUser(), rc.recordController.OtherRecordHealth)
+	router.GET("/health", middleware.DeserializeUser(), rc.recordController.GetRecordHealth)
 
 }
