@@ -53,18 +53,18 @@ import (
 
 type Plan struct {
 	ID          uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
-	Name        string    `json:"name,omitempty"`
-	Description string    `json:"description,omitempty"`
-	Photo       string    `json:"photo,omitempty"`
-	Type        string    `json:"type,omitempty"`
-	Detail      Detail    `gorm:"type:json" json:"detail,omitempty"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	Photo       string    `json:"photo"`
+	Type        string    `json:"type"`
+	Detail      Detail    `gorm:"type:json" json:"detail"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
 
 type Detail struct {
-	Name []string `json:"name,omitempty"`
-	Day  []string `json:"day,omitempty"`
+	Name []string `json:"name"`
+	Day  []string `json:"day"`
 }
 
 func (dr *Detail) Scan(value interface{}) error {

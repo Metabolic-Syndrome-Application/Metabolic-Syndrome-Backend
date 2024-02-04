@@ -17,8 +17,19 @@ func NewRecordRouteController(recordController controllers.RecordController) Rec
 func (rc *RecordRouteController) RecordRoute(rg *gin.RouterGroup) {
 
 	router := rg.Group("record")
+
+	//create record health by patient
 	router.POST("/health", middleware.DeserializeUser(), rc.recordController.RecordHealth)
+	//create record health by hospital
 	router.POST("/health/:id", middleware.DeserializeUser(), rc.recordController.OtherRecordHealth)
-	router.GET("/health", middleware.DeserializeUser(), rc.recordController.GetRecordHealth)
+	// get other record health (record by patient / hospital)
+	router.GET("/health/:id", middleware.DeserializeUser(), rc.recordController.GetOtherRecordHealth)
+	// get my record health (record by patient)
+	router.GET("/health/patient", middleware.DeserializeUser(), rc.recordController.GetRecordHealthByPatient)
+
+	// // get other record health (record by patient)
+	// router.GET("/health/patient/:id", middleware.DeserializeUser(), rc.recordController.GetRecordHealthByPatient)
+	// // get other record health (record by hospital)
+	// router.GET("/health/hospital/:id", middleware.DeserializeUser(), rc.recordController.GetRecordHealthByPatient)
 
 }

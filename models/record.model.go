@@ -8,19 +8,19 @@ import (
 
 type RecordHealth struct {
 	ID                     uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
-	PatientID              uuid.UUID `gorm:"type:uuid ;null" json:"patientID,omitempty"`
-	Height                 float32   `json:"height,omitempty"`
-	Weight                 float32   `json:"weight,omitempty"`
-	Waistline              float32   `json:"waistline,omitempty"`
-	SystolicBloodPressure  int       `json:"systolicBloodPressure,omitempty"`
-	DiastolicBloodPressure int       `json:"diastolicBloodPressure,omitempty"`
-	PulseRate              int       `json:"pulseRate,omitempty"`
-	BloodGlucose           float32   `json:"bloodGlucose,omitempty"`
-	Cholesterol            float32   `json:"cholesterol,omitempty"`
-	HDL                    float32   `json:"hdl,omitempty"`
-	LDL                    float32   `json:"ldl,omitempty"`
-	Triglyceride           float32   `json:"triglyceride,omitempty"`
-	RecordBy               string    `json:"recordBy,omitempty"`
+	PatientID              uuid.UUID `gorm:"type:uuid ;null" json:"patientID"`
+	Height                 float32   `json:"height"`
+	Weight                 float32   `json:"weight"`
+	Waistline              float32   `json:"waistline"`
+	SystolicBloodPressure  int       `json:"systolicBloodPressure"`
+	DiastolicBloodPressure int       `json:"diastolicBloodPressure"`
+	PulseRate              int       `json:"pulseRate"`
+	BloodGlucose           float32   `json:"bloodGlucose"`
+	Cholesterol            float32   `json:"cholesterol"`
+	HDL                    float32   `json:"hdl"`
+	LDL                    float32   `json:"ldl"`
+	Triglyceride           float32   `json:"triglyceride"`
+	RecordBy               string    `json:"recordBy"`
 	Timestamp              time.Time
 }
 

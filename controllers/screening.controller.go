@@ -204,7 +204,7 @@ func (sc *ScreeningController) DiseaseRisk(ctx *gin.Context) {
 			countDiabetes += 4
 		}
 		//bmi
-		bmi := RecordHealthPatient.Weight / (float32(RecordHealthPatient.Height) / 100)
+		bmi := RecordHealthPatient.Weight / ((float32(RecordHealthPatient.Height) / 100) * (float32(RecordHealthPatient.Height) / 100))
 		if bmi >= 23 && bmi < 27.5 {
 			countDiabetes += 1
 		} else if bmi >= 27.5 {
@@ -299,7 +299,7 @@ func (sc *ScreeningController) DiseaseRisk(ctx *gin.Context) {
 
 	//screening Obesity
 	calObesity := func() string {
-		bmi := RecordHealthPatient.Weight / (float32(RecordHealthPatient.Height) / 100)
+		bmi := RecordHealthPatient.Weight / ((float32(RecordHealthPatient.Height) / 100) * (float32(RecordHealthPatient.Height) / 100))
 		if bmi < 23 {
 			return "low"
 		} else if bmi < 25 {

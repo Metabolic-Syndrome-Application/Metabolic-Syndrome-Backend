@@ -28,12 +28,12 @@ func (User) TableName() string {
 type Doctor struct {
 	ID         uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
 	Username   string    `gorm:"type:varchar(255);not null" json:"username"`
-	Prefix     string    `json:"prefix,omitempty"`
-	FirstName  string    `json:"firstName,omitempty"`
-	LastName   string    `json:"lastName,omitempty"`
-	Gender     string    `json:"gender,omitempty"`
-	Department string    `json:"department,omitempty"`
-	Specialist string    `json:"specialist,omitempty"`
+	Prefix     string    `json:"prefix"`
+	FirstName  string    `json:"firstName"`
+	LastName   string    `json:"lastName"`
+	Gender     string    `json:"gender"`
+	Department string    `json:"department"`
+	Specialist string    `json:"specialist"`
 	UpdatedAt  time.Time `json:"updateAt"`
 }
 
@@ -44,12 +44,12 @@ func (Doctor) TableName() string {
 type Staff struct {
 	ID         uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
 	Username   string    `gorm:"type:varchar(255);not null" json:"username"`
-	Prefix     string    `json:"prefix,omitempty"`
-	FirstName  string    `json:"firstName,omitempty"`
-	LastName   string    `json:"lastName,omitempty"`
-	Gender     string    `json:"gender,omitempty"`
-	Department string    `json:"department,omitempty"`
-	Specialist string    `json:"specialist,omitempty"`
+	Prefix     string    `json:"prefix"`
+	FirstName  string    `json:"firstName"`
+	LastName   string    `json:"lastName"`
+	Gender     string    `json:"gender"`
+	Department string    `json:"department"`
+	Specialist string    `json:"specialist"`
 	UpdatedAt  time.Time `json:"updateAt"`
 }
 
@@ -59,25 +59,25 @@ func (Staff) TableName() string {
 
 type Patient struct {
 	ID                 uuid.UUID      `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
-	HN                 string         `json:"hn,omitempty"`
-	Alias              string         `json:"alias,omitempty"`
-	FirstName          string         `json:"firstName,omitempty"`
-	LastName           string         `json:"lastName,omitempty"`
-	YearOfBirth        int            `json:"yearOfBirth,omitempty"`
-	Gender             string         `json:"gender,omitempty"`
-	Occupation         string         `json:"occupation,omitempty"`
-	Photo              string         `json:"photo,omitempty"`
-	MainDoctorID       *uuid.UUID     `gorm:"type:uuid ;null" json:"mainDoctorID,omitempty"`
-	MainDoctor         Doctor         `gorm:"foreignKey:MainDoctorID; " json:"mainDoctor,omitempty"`
-	AssistanceDoctorID *uuid.UUID     `gorm:"type:uuid ;null" json:"assistanceDoctorID,omitempty"`
-	AssistanceDoctor   Doctor         `gorm:"foreignKey:AssistanceDoctorID;" json:"assistanceDoctor,omitempty"`
-	DiseaseRisk        DiseaseRisk    `gorm:"type:jsonb" json:"diseaseRisk,omitempty"`
-	PlanID             pq.StringArray `gorm:"type:uuid[];column:plan_id" json:"planID,omitempty"`
-	Plan               []Plan         `gorm:"many2many:patient_plan;association_foreignkey:ID;joinForeignKey:PatientID;References:ID;joinReferences:PlanID" json:"Plan,omitempty"`
-	ChallengeID        *uuid.UUID     `gorm:"type:uuid ;null" json:"challengeID,omitempty"`
-	Challenge          Challenge      `gorm:"foreignKey:ChallengeID;" json:"challenge,omitempty"`
-	CollectPoints      int            `json:"collectPoints,omitempty"`
-	Status             string         `gorm:"default:'in process' " json:"status,omitempty"`
+	HN                 *string        `json:"hn"`
+	Alias              string         `json:"alias"`
+	FirstName          string         `json:"firstName"`
+	LastName           string         `json:"lastName"`
+	YearOfBirth        int            `json:"yearOfBirth"`
+	Gender             string         `json:"gender"`
+	Occupation         string         `json:"occupation"`
+	Photo              string         `json:"photo"`
+	MainDoctorID       *uuid.UUID     `gorm:"type:uuid ;null" json:"mainDoctorID"`
+	MainDoctor         Doctor         `gorm:"foreignKey:MainDoctorID; " json:"mainDoctor"`
+	AssistanceDoctorID *uuid.UUID     `gorm:"type:uuid ;null" json:"assistanceDoctorID"`
+	AssistanceDoctor   Doctor         `gorm:"foreignKey:AssistanceDoctorID;" json:"assistanceDoctor"`
+	DiseaseRisk        DiseaseRisk    `gorm:"type:jsonb" json:"diseaseRisk"`
+	PlanID             pq.StringArray `gorm:"type:uuid[];column:plan_id" json:"planID"`
+	Plan               []Plan         `gorm:"many2many:patient_plan;association_foreignkey:ID;joinForeignKey:PatientID;References:ID;joinReferences:PlanID" json:"Plan"`
+	ChallengeID        *uuid.UUID     `gorm:"type:uuid ;null" json:"challengeID"`
+	Challenge          Challenge      `gorm:"foreignKey:ChallengeID;" json:"challenge"`
+	CollectPoints      int            `json:"collectPoints"`
+	Status             string         `gorm:"default:'in process' " json:"status"`
 	UpdatedAt          time.Time      `json:"updateAt"`
 }
 type DiseaseRisk struct {
@@ -141,10 +141,10 @@ type SignInInput struct {
 }
 
 type UserResponse struct {
-	ID        uuid.UUID `json:"id,omitempty"`
+	ID        uuid.UUID `json:"id"`
 	Username  string    `gorm:"type:varchar(255);not null" json:"username"`
-	Role      string    `json:"role,omitempty"`
-	Photo     string    `json:"photo,omitempty"`
+	Role      string    `json:"role"`
+	Photo     string    `json:"photo"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }

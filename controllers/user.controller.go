@@ -26,12 +26,12 @@ func (uc *UserController) UpdateProfile(ctx *gin.Context) {
 	// patient
 	if currentUser.Role == "patient" {
 		var payload = struct {
-			Alias       string `json:"alias,omitempty"`
-			FirstName   string `json:"firstName,omitempty"`
-			LastName    string `json:"lastName,omitempty"`
-			YearOfBirth int    `json:"yearOfBirth,omitempty"`
-			Gender      string `json:"gender,omitempty"`
-			Photo       string `json:"photo,omitempty"`
+			Alias       string `json:"alias"`
+			FirstName   string `json:"firstName"`
+			LastName    string `json:"lastName"`
+			YearOfBirth int    `json:"yearOfBirth"`
+			Gender      string `json:"gender"`
+			Photo       string `json:"photo"`
 		}{} // {} = default is null
 		if err := ctx.ShouldBindJSON(&payload); err != nil {
 			ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
@@ -44,7 +44,6 @@ func (uc *UserController) UpdateProfile(ctx *gin.Context) {
 			return
 		}
 		updatePatient := &models.Patient{
-			ID:          currentUser.ID,
 			Alias:       payload.Alias,
 			FirstName:   payload.FirstName,
 			LastName:    payload.LastName,
@@ -53,7 +52,7 @@ func (uc *UserController) UpdateProfile(ctx *gin.Context) {
 			Photo:       payload.Photo,
 		}
 
-		a := uc.DB.Model(&updateProfilePatient).Save(updatePatient)
+		a := uc.DB.Model(&updateProfilePatient).Updates(updatePatient)
 		if a.Error != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update profile patient"})
 			return
@@ -81,7 +80,6 @@ func (uc *UserController) UpdateProfile(ctx *gin.Context) {
 			return
 		}
 		updateDoctor := &models.Doctor{
-			ID:         currentUser.ID,
 			Prefix:     payload.Prefix,
 			FirstName:  payload.FirstName,
 			LastName:   payload.LastName,
@@ -90,7 +88,7 @@ func (uc *UserController) UpdateProfile(ctx *gin.Context) {
 			Specialist: payload.Specialist,
 		}
 
-		a := uc.DB.Model(&updateProfileDoctor).Save(updateDoctor)
+		a := uc.DB.Model(&updateProfileDoctor).Updates(updateDoctor)
 		if a.Error != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update profile Doctor"})
 			return
@@ -118,7 +116,6 @@ func (uc *UserController) UpdateProfile(ctx *gin.Context) {
 			return
 		}
 		updateStaff := &models.Staff{
-			ID:         currentUser.ID,
 			Prefix:     payload.Prefix,
 			FirstName:  payload.FirstName,
 			LastName:   payload.LastName,
@@ -127,7 +124,7 @@ func (uc *UserController) UpdateProfile(ctx *gin.Context) {
 			Specialist: payload.Specialist,
 		}
 
-		a := uc.DB.Model(&updateProfileStaff).Save(updateStaff)
+		a := uc.DB.Model(&updateProfileStaff).Updates(updateStaff)
 		if a.Error != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update profile Staff"})
 			return
@@ -194,7 +191,7 @@ func (uc *UserController) GetAllUserProfile(ctx *gin.Context) {
 		}
 		type Response struct {
 			ID           uuid.UUID  `json:"id"`
-			HN           string     `json:"hn,omitempty"`
+			HN           *string    `json:"hn,omitempty"`
 			FirstName    string     `json:"firstName,omitempty"`
 			LastName     string     `json:"lastName,omitempty"`
 			Gender       string     `json:"gender,omitempty"`
@@ -278,7 +275,7 @@ func (uc *UserController) GetAllUserProfile(ctx *gin.Context) {
 		}
 		type Response struct {
 			ID           uuid.UUID  `json:"id"`
-			HN           string     `json:"hn,omitempty"`
+			HN           *string    `json:"hn,omitempty"`
 			FirstName    string     `json:"firstName,omitempty"`
 			LastName     string     `json:"lastName,omitempty"`
 			Gender       string     `json:"gender,omitempty"`
@@ -324,7 +321,7 @@ func (uc *UserController) UpdateOtherProfile(ctx *gin.Context) {
 		}
 
 		var payload = struct {
-			HN                 string     `json:"hn,omitempty"`
+			HN                 *string    `json:"hn,omitempty"`
 			FirstName          string     `json:"firstName,omitempty"`
 			LastName           string     `json:"lastName,omitempty"`
 			YearOfBirth        int        `json:"yearOfBirth,omitempty"`
@@ -368,7 +365,7 @@ func (uc *UserController) UpdateOtherProfile(ctx *gin.Context) {
 			Status:             payload.Status,
 		}
 
-		result = uc.DB.Model(&patient).Save(updatePatient)
+		result = uc.DB.Model(&patient).Updates(updatePatient)
 		if result.Error != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update profile patient"})
 			return
@@ -420,7 +417,7 @@ func (uc *UserController) UpdateOtherProfile(ctx *gin.Context) {
 			Department: payload.Department,
 			Specialist: payload.Specialist,
 		}
-		a := uc.DB.Model(&doctor).Save(updateDoctor)
+		a := uc.DB.Model(&doctor).Updates(updateDoctor)
 		if a.Error != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update profile doctor"})
 			return
@@ -455,7 +452,7 @@ func (uc *UserController) UpdateOtherProfile(ctx *gin.Context) {
 			Department: payload.Department,
 			Specialist: payload.Specialist,
 		}
-		a := uc.DB.Model(&staff).Save(updateStaff)
+		a := uc.DB.Model(&staff).Updates(updateStaff)
 		if a.Error != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update profile staff"})
 			return
