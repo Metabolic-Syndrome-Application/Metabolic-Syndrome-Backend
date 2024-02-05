@@ -187,7 +187,7 @@ func (rc *RecordController) GetRecordHealthByPatient(ctx *gin.Context) {
 	type Response struct {
 		Height                 float32 `json:"height"`
 		Weight                 float32 `json:"weight"`
-		BMI                    float32
+		BMI                    float32 `json:"bmi"`
 		Waistline              float32 `json:"waistline"`
 		SystolicBloodPressure  int     `json:"systolicBloodPressure"`
 		DiastolicBloodPressure int     `json:"diastolicBloodPressure"`
@@ -224,4 +224,395 @@ func (rc *RecordController) GetRecordHealthByPatient(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"record": data}})
 
+}
+
+func (rc *RecordController) GetOtherRecordHealthByPatient(ctx *gin.Context) {
+	userID := ctx.Param("id")
+	var records []models.RecordHealth
+	result := rc.DB.Where("patient_id = ? AND record_by = 'patient'", userID).Find(&records)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
+		return
+	}
+	type Response struct {
+		Height                 float32 `json:"height"`
+		Weight                 float32 `json:"weight"`
+		BMI                    float32 `json:"bmi"`
+		Waistline              float32 `json:"waistline"`
+		SystolicBloodPressure  int     `json:"systolicBloodPressure"`
+		DiastolicBloodPressure int     `json:"diastolicBloodPressure"`
+		PulseRate              int     `json:"pulseRate"`
+		BloodGlucose           float32 `json:"bloodGlucose"`
+		Cholesterol            float32 `json:"cholesterol"`
+		HDL                    float32 `json:"hdl"`
+		LDL                    float32 `json:"ldl"`
+		Triglyceride           float32 `json:"triglyceride"`
+		RecordBy               string  `json:"recordBy"`
+		Timestamp              string
+	}
+	var data []Response
+	for _, record := range records {
+		bmi := record.Weight / ((float32(record.Height) / 100) * (float32(record.Height) / 100))
+		response := Response{
+			Height:                 record.Height,
+			Weight:                 record.Weight,
+			BMI:                    bmi,
+			Waistline:              record.Waistline,
+			SystolicBloodPressure:  record.SystolicBloodPressure,
+			DiastolicBloodPressure: record.DiastolicBloodPressure,
+			PulseRate:              record.PulseRate,
+			BloodGlucose:           record.BloodGlucose,
+			Cholesterol:            record.Cholesterol,
+			HDL:                    record.HDL,
+			LDL:                    record.LDL,
+			Triglyceride:           record.Triglyceride,
+			RecordBy:               record.RecordBy,
+			Timestamp:              record.Timestamp.Format("2006-01-02 15:04:05"),
+		}
+		data = append(data, response)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"record": data}})
+
+}
+
+func (rc *RecordController) GetOtherRecordHealthByHospital(ctx *gin.Context) {
+	userID := ctx.Param("id")
+	var records []models.RecordHealth
+	result := rc.DB.Where("patient_id = ? AND (record_by = 'doctor' OR record_by = 'staff')", userID).Find(&records)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
+		return
+	}
+	type Response struct {
+		Height                 float32 `json:"height"`
+		Weight                 float32 `json:"weight"`
+		BMI                    float32 `json:"bmi"`
+		Waistline              float32 `json:"waistline"`
+		SystolicBloodPressure  int     `json:"systolicBloodPressure"`
+		DiastolicBloodPressure int     `json:"diastolicBloodPressure"`
+		PulseRate              int     `json:"pulseRate"`
+		BloodGlucose           float32 `json:"bloodGlucose"`
+		Cholesterol            float32 `json:"cholesterol"`
+		HDL                    float32 `json:"hdl"`
+		LDL                    float32 `json:"ldl"`
+		Triglyceride           float32 `json:"triglyceride"`
+		RecordBy               string  `json:"recordBy"`
+		Timestamp              string
+	}
+	var data []Response
+	for _, record := range records {
+		bmi := record.Weight / ((float32(record.Height) / 100) * (float32(record.Height) / 100))
+		response := Response{
+			Height:                 record.Height,
+			Weight:                 record.Weight,
+			BMI:                    bmi,
+			Waistline:              record.Waistline,
+			SystolicBloodPressure:  record.SystolicBloodPressure,
+			DiastolicBloodPressure: record.DiastolicBloodPressure,
+			PulseRate:              record.PulseRate,
+			BloodGlucose:           record.BloodGlucose,
+			Cholesterol:            record.Cholesterol,
+			HDL:                    record.HDL,
+			LDL:                    record.LDL,
+			Triglyceride:           record.Triglyceride,
+			RecordBy:               record.RecordBy,
+			Timestamp:              record.Timestamp.Format("2006-01-02 15:04:05"),
+		}
+		data = append(data, response)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"record": data}})
+
+}
+
+func (rc *RecordController) GetRecordHealthByPatientBmi(ctx *gin.Context) {
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	var records []models.RecordHealth
+	result := rc.DB.Where("patient_id = ? AND record_by = 'patient'", currentUser.ID).Find(&records)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
+		return
+	}
+	type Response struct {
+		BMI       float32 `json:"bmi"`
+		RecordBy  string  `json:"recordBy"`
+		Timestamp string
+	}
+	var data []Response
+	for _, record := range records {
+		bmi := record.Weight / ((float32(record.Height) / 100) * (float32(record.Height) / 100))
+		response := Response{
+			BMI:       bmi,
+			RecordBy:  record.RecordBy,
+			Timestamp: record.Timestamp.Format("2006-01-02 15:04:05"),
+		}
+		data = append(data, response)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"record": data}})
+
+}
+
+func (rc *RecordController) GetRecordHealthByPatientWaistline(ctx *gin.Context) {
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	var records []models.RecordHealth
+	result := rc.DB.Where("patient_id = ? AND record_by = 'patient'", currentUser.ID).Find(&records)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
+		return
+	}
+	type Response struct {
+		Waistline float32 `json:"waistline"`
+		RecordBy  string  `json:"recordBy"`
+		Timestamp string
+	}
+	var data []Response
+	for _, record := range records {
+		response := Response{
+			Waistline: record.Waistline,
+			RecordBy:  record.RecordBy,
+			Timestamp: record.Timestamp.Format("2006-01-02 15:04:05"),
+		}
+		data = append(data, response)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"record": data}})
+
+}
+
+func (rc *RecordController) GetRecordHealthByPatientBloodGlucose(ctx *gin.Context) {
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	var records []models.RecordHealth
+	result := rc.DB.Where("patient_id = ? AND record_by = 'patient'", currentUser.ID).Find(&records)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
+		return
+	}
+	type Response struct {
+		BloodGlucose float32 `json:"bloodGlucose"`
+		RecordBy     string  `json:"recordBy"`
+		Timestamp    string
+	}
+	var data []Response
+	for _, record := range records {
+		response := Response{
+			BloodGlucose: record.BloodGlucose,
+			RecordBy:     record.RecordBy,
+			Timestamp:    record.Timestamp.Format("2006-01-02 15:04:05"),
+		}
+		data = append(data, response)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"record": data}})
+
+}
+
+func (rc *RecordController) GetRecordHealthByPatientBloodLipids(ctx *gin.Context) {
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	var records []models.RecordHealth
+	result := rc.DB.Where("patient_id = ? AND record_by = 'patient'", currentUser.ID).Find(&records)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
+		return
+	}
+	type Response struct {
+		Cholesterol  float32 `json:"cholesterol"`
+		HDL          float32 `json:"hdl"`
+		LDL          float32 `json:"ldl"`
+		Triglyceride float32 `json:"triglyceride"`
+		RecordBy     string  `json:"recordBy"`
+		Timestamp    string
+	}
+	var data []Response
+	for _, record := range records {
+		response := Response{
+			Cholesterol:  record.Cholesterol,
+			HDL:          record.HDL,
+			LDL:          record.LDL,
+			Triglyceride: record.Triglyceride,
+			RecordBy:     record.RecordBy,
+			Timestamp:    record.Timestamp.Format("2006-01-02 15:04:05"),
+		}
+		data = append(data, response)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"record": data}})
+
+}
+
+func (rc *RecordController) GetRecordHealthByPatientBloodPressure(ctx *gin.Context) {
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	var records []models.RecordHealth
+	result := rc.DB.Where("patient_id = ? AND record_by = 'patient'", currentUser.ID).Find(&records)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
+		return
+	}
+	type Response struct {
+		SystolicBloodPressure  int    `json:"systolicBloodPressure"`
+		DiastolicBloodPressure int    `json:"diastolicBloodPressure"`
+		PulseRate              int    `json:"pulseRate"`
+		RecordBy               string `json:"recordBy"`
+		Timestamp              string
+	}
+	var data []Response
+	for _, record := range records {
+		response := Response{
+			SystolicBloodPressure:  record.SystolicBloodPressure,
+			DiastolicBloodPressure: record.DiastolicBloodPressure,
+			PulseRate:              record.PulseRate,
+			RecordBy:               record.RecordBy,
+			Timestamp:              record.Timestamp.Format("2006-01-02 15:04:05"),
+		}
+		data = append(data, response)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"record": data}})
+
+}
+
+func (rc *RecordController) GetOtherRecordHealthByPatientBmi(ctx *gin.Context) {
+	userID := ctx.Param("id")
+	var records []models.RecordHealth
+	result := rc.DB.Where("patient_id = ? AND record_by = 'patient'", userID).Find(&records)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
+		return
+	}
+	type Response struct {
+		BMI       float32 `json:"bmi"`
+		RecordBy  string  `json:"recordBy"`
+		Timestamp string
+	}
+	var data []Response
+	for _, record := range records {
+		bmi := record.Weight / ((float32(record.Height) / 100) * (float32(record.Height) / 100))
+		response := Response{
+			BMI:       bmi,
+			RecordBy:  record.RecordBy,
+			Timestamp: record.Timestamp.Format("2006-01-02 15:04:05"),
+		}
+		data = append(data, response)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"record": data}})
+
+}
+
+func (rc *RecordController) GetOtherRecordHealthByPatientWaistline(ctx *gin.Context) {
+	userID := ctx.Param("id")
+	var records []models.RecordHealth
+	result := rc.DB.Where("patient_id = ? AND record_by = 'patient'", userID).Find(&records)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
+		return
+	}
+	type Response struct {
+		Waistline float32 `json:"waistline"`
+		RecordBy  string  `json:"recordBy"`
+		Timestamp string
+	}
+	var data []Response
+	for _, record := range records {
+		response := Response{
+			Waistline: record.Waistline,
+			RecordBy:  record.RecordBy,
+			Timestamp: record.Timestamp.Format("2006-01-02 15:04:05"),
+		}
+		data = append(data, response)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"record": data}})
+
+}
+
+func (rc *RecordController) GetOtherRecordHealthByPatientBloodGlucose(ctx *gin.Context) {
+	userID := ctx.Param("id")
+	var records []models.RecordHealth
+	result := rc.DB.Where("patient_id = ? AND record_by = 'patient'", userID).Find(&records)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
+		return
+	}
+	type Response struct {
+		BloodGlucose float32 `json:"bloodGlucose"`
+		RecordBy     string  `json:"recordBy"`
+		Timestamp    string
+	}
+	var data []Response
+	for _, record := range records {
+		response := Response{
+			BloodGlucose: record.BloodGlucose,
+			RecordBy:     record.RecordBy,
+			Timestamp:    record.Timestamp.Format("2006-01-02 15:04:05"),
+		}
+		data = append(data, response)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"record": data}})
+
+}
+
+func (rc *RecordController) GetOtherRecordHealthByPatientBloodLipids(ctx *gin.Context) {
+	userID := ctx.Param("id")
+	var records []models.RecordHealth
+	result := rc.DB.Where("patient_id = ? AND record_by = 'patient'", userID).Find(&records)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
+		return
+	}
+	type Response struct {
+		Cholesterol  float32 `json:"cholesterol"`
+		HDL          float32 `json:"hdl"`
+		LDL          float32 `json:"ldl"`
+		Triglyceride float32 `json:"triglyceride"`
+		RecordBy     string  `json:"recordBy"`
+		Timestamp    string
+	}
+	var data []Response
+	for _, record := range records {
+		response := Response{
+			Cholesterol:  record.Cholesterol,
+			HDL:          record.HDL,
+			LDL:          record.LDL,
+			Triglyceride: record.Triglyceride,
+			RecordBy:     record.RecordBy,
+			Timestamp:    record.Timestamp.Format("2006-01-02 15:04:05"),
+		}
+		data = append(data, response)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"record": data}})
+
+}
+
+func (rc *RecordController) GetOtherRecordHealthByPatientBloodPressure(ctx *gin.Context) {
+	userID := ctx.Param("id")
+	var records []models.RecordHealth
+	result := rc.DB.Where("patient_id = ? AND record_by = 'patient'", userID).Find(&records)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
+		return
+	}
+	type Response struct {
+		SystolicBloodPressure  int    `json:"systolicBloodPressure"`
+		DiastolicBloodPressure int    `json:"diastolicBloodPressure"`
+		PulseRate              int    `json:"pulseRate"`
+		RecordBy               string `json:"recordBy"`
+		Timestamp              string
+	}
+	var data []Response
+	for _, record := range records {
+		response := Response{
+			SystolicBloodPressure:  record.SystolicBloodPressure,
+			DiastolicBloodPressure: record.DiastolicBloodPressure,
+			PulseRate:              record.PulseRate,
+			RecordBy:               record.RecordBy,
+			Timestamp:              record.Timestamp.Format("2006-01-02 15:04:05"),
+		}
+		data = append(data, response)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"record": data}})
 }
