@@ -176,10 +176,10 @@ func (rc *RecordController) GetOtherRecordHealth(ctx *gin.Context) {
 
 }
 
-func (rc *RecordController) GetRecordHealthByPatient(ctx *gin.Context) {
+func (rc *RecordController) GetRecordHealthByPatientLatest(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	var records []models.RecordHealth
-	result := rc.DB.Order("timestamp DESC").Where("patient_id = ? AND record_by = 'patient'", currentUser.ID).Find(&records)
+	result := rc.DB.Order("timestamp DESC").Where("patient_id = ? AND record_by = 'patient'", currentUser.ID).First(&records)
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
 		return
