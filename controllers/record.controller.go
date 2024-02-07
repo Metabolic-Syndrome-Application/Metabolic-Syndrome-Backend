@@ -129,7 +129,7 @@ func (rc *RecordController) OtherRecordHealth(ctx *gin.Context) {
 func (rc *RecordController) GetOtherRecordHealth(ctx *gin.Context) {
 	userID := ctx.Param("id")
 	var records []models.RecordHealth
-	result := rc.DB.Where("patient_id = ?", userID).Find(&records)
+	result := rc.DB.Order("timestamp DESC").Where("patient_id = ?", userID).Find(&records)
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
 		return
@@ -179,7 +179,7 @@ func (rc *RecordController) GetOtherRecordHealth(ctx *gin.Context) {
 func (rc *RecordController) GetRecordHealthByPatient(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	var records []models.RecordHealth
-	result := rc.DB.Where("patient_id = ? AND record_by = 'patient'", currentUser.ID).Find(&records)
+	result := rc.DB.Order("timestamp DESC").Where("patient_id = ? AND record_by = 'patient'", currentUser.ID).Find(&records)
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
 		return
@@ -229,7 +229,7 @@ func (rc *RecordController) GetRecordHealthByPatient(ctx *gin.Context) {
 func (rc *RecordController) GetOtherRecordHealthByPatient(ctx *gin.Context) {
 	userID := ctx.Param("id")
 	var records []models.RecordHealth
-	result := rc.DB.Where("patient_id = ? AND record_by = 'patient'", userID).Find(&records)
+	result := rc.DB.Order("timestamp DESC").Where("patient_id = ? AND record_by = 'patient'", userID).Find(&records)
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
 		return
@@ -279,7 +279,7 @@ func (rc *RecordController) GetOtherRecordHealthByPatient(ctx *gin.Context) {
 func (rc *RecordController) GetOtherRecordHealthByHospital(ctx *gin.Context) {
 	userID := ctx.Param("id")
 	var records []models.RecordHealth
-	result := rc.DB.Where("patient_id = ? AND (record_by = 'doctor' OR record_by = 'staff')", userID).Find(&records)
+	result := rc.DB.Order("timestamp DESC").Where("patient_id = ? AND (record_by = 'doctor' OR record_by = 'staff')", userID).Find(&records)
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
 		return
@@ -329,7 +329,7 @@ func (rc *RecordController) GetOtherRecordHealthByHospital(ctx *gin.Context) {
 func (rc *RecordController) GetRecordHealthByPatientBmi(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	var records []models.RecordHealth
-	result := rc.DB.Where("patient_id = ? AND record_by = 'patient'", currentUser.ID).Find(&records)
+	result := rc.DB.Order("timestamp DESC").Where("patient_id = ? AND record_by = 'patient'", currentUser.ID).Find(&records)
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
 		return
@@ -357,7 +357,7 @@ func (rc *RecordController) GetRecordHealthByPatientBmi(ctx *gin.Context) {
 func (rc *RecordController) GetRecordHealthByPatientWaistline(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	var records []models.RecordHealth
-	result := rc.DB.Where("patient_id = ? AND record_by = 'patient'", currentUser.ID).Find(&records)
+	result := rc.DB.Order("timestamp DESC").Where("patient_id = ? AND record_by = 'patient'", currentUser.ID).Find(&records)
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
 		return
@@ -384,7 +384,7 @@ func (rc *RecordController) GetRecordHealthByPatientWaistline(ctx *gin.Context) 
 func (rc *RecordController) GetRecordHealthByPatientBloodGlucose(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	var records []models.RecordHealth
-	result := rc.DB.Where("patient_id = ? AND record_by = 'patient'", currentUser.ID).Find(&records)
+	result := rc.DB.Order("timestamp DESC").Where("patient_id = ? AND record_by = 'patient'", currentUser.ID).Find(&records)
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
 		return
@@ -411,7 +411,7 @@ func (rc *RecordController) GetRecordHealthByPatientBloodGlucose(ctx *gin.Contex
 func (rc *RecordController) GetRecordHealthByPatientBloodLipids(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	var records []models.RecordHealth
-	result := rc.DB.Where("patient_id = ? AND record_by = 'patient'", currentUser.ID).Find(&records)
+	result := rc.DB.Order("timestamp DESC").Where("patient_id = ? AND record_by = 'patient'", currentUser.ID).Find(&records)
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
 		return
@@ -444,7 +444,7 @@ func (rc *RecordController) GetRecordHealthByPatientBloodLipids(ctx *gin.Context
 func (rc *RecordController) GetRecordHealthByPatientBloodPressure(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	var records []models.RecordHealth
-	result := rc.DB.Where("patient_id = ? AND record_by = 'patient'", currentUser.ID).Find(&records)
+	result := rc.DB.Order("timestamp DESC").Where("patient_id = ? AND record_by = 'patient'", currentUser.ID).Find(&records)
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
 		return
@@ -475,7 +475,7 @@ func (rc *RecordController) GetRecordHealthByPatientBloodPressure(ctx *gin.Conte
 func (rc *RecordController) GetOtherRecordHealthByPatientBmi(ctx *gin.Context) {
 	userID := ctx.Param("id")
 	var records []models.RecordHealth
-	result := rc.DB.Where("patient_id = ? AND record_by = 'patient'", userID).Find(&records)
+	result := rc.DB.Order("timestamp DESC").Where("patient_id = ? AND record_by = 'patient'", userID).Find(&records)
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
 		return
@@ -503,7 +503,7 @@ func (rc *RecordController) GetOtherRecordHealthByPatientBmi(ctx *gin.Context) {
 func (rc *RecordController) GetOtherRecordHealthByPatientWaistline(ctx *gin.Context) {
 	userID := ctx.Param("id")
 	var records []models.RecordHealth
-	result := rc.DB.Where("patient_id = ? AND record_by = 'patient'", userID).Find(&records)
+	result := rc.DB.Order("timestamp DESC").Where("patient_id = ? AND record_by = 'patient'", userID).Find(&records)
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
 		return
@@ -530,7 +530,7 @@ func (rc *RecordController) GetOtherRecordHealthByPatientWaistline(ctx *gin.Cont
 func (rc *RecordController) GetOtherRecordHealthByPatientBloodGlucose(ctx *gin.Context) {
 	userID := ctx.Param("id")
 	var records []models.RecordHealth
-	result := rc.DB.Where("patient_id = ? AND record_by = 'patient'", userID).Find(&records)
+	result := rc.DB.Order("timestamp DESC").Where("patient_id = ? AND record_by = 'patient'", userID).Find(&records)
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
 		return
@@ -557,7 +557,7 @@ func (rc *RecordController) GetOtherRecordHealthByPatientBloodGlucose(ctx *gin.C
 func (rc *RecordController) GetOtherRecordHealthByPatientBloodLipids(ctx *gin.Context) {
 	userID := ctx.Param("id")
 	var records []models.RecordHealth
-	result := rc.DB.Where("patient_id = ? AND record_by = 'patient'", userID).Find(&records)
+	result := rc.DB.Order("timestamp DESC").Where("patient_id = ? AND record_by = 'patient'", userID).Find(&records)
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
 		return
@@ -590,7 +590,7 @@ func (rc *RecordController) GetOtherRecordHealthByPatientBloodLipids(ctx *gin.Co
 func (rc *RecordController) GetOtherRecordHealthByPatientBloodPressure(ctx *gin.Context) {
 	userID := ctx.Param("id")
 	var records []models.RecordHealth
-	result := rc.DB.Where("patient_id = ? AND record_by = 'patient'", userID).Find(&records)
+	result := rc.DB.Order("timestamp DESC").Where("patient_id = ? AND record_by = 'patient'", userID).Find(&records)
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
 		return
@@ -615,4 +615,9 @@ func (rc *RecordController) GetOtherRecordHealthByPatientBloodPressure(ctx *gin.
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"record": data}})
+}
+
+// plan
+func (rc *RecordController) RecordPlan(ctx *gin.Context) {
+
 }
