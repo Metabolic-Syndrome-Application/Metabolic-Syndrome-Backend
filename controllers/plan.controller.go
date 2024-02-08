@@ -312,11 +312,44 @@ func (pc *PlanController) GetAllPlan(ctx *gin.Context) {
 // Delete plan
 func (pc *PlanController) DeletePlan(ctx *gin.Context) {
 	planID := ctx.Param("id")
+	// Delete the references to the plan from the patient_plan table
+	if err := pc.DB.Exec("DELETE FROM patient_plan WHERE plan_id = ?", planID).Error; err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "fail", "message": "Failed to delete references to the plan"})
+		return
+	}
+
+	// find patienta that have this planID
+	var patients []models.Patient
+	if err := pc.DB.Where("plan_id @> ARRAY[?]::uuid[]", planID).Find(&patients).Error; err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "fail", "message": "error"})
+		return
+	}
+
+	// delete planID from planID of patient
+	for _, patient := range patients {
+		indexToDelete := -1
+		for i, pid := range patient.PlanID {
+			if pid == planID {
+				indexToDelete = i
+				break
+			}
+		}
+		if indexToDelete != -1 {
+			patient.PlanID = append(patient.PlanID[:indexToDelete], patient.PlanID[indexToDelete+1:]...)
+			if err := pc.DB.Save(&patient).Error; err != nil {
+				ctx.JSON(http.StatusInternalServerError, gin.H{"status": "fail", "message": "เกิดข้อผิดพลาดในการบันทึกข้อมูล patient"})
+				return
+			}
+		}
+	}
+
+	// Now you can safely delete the plan
 	result := pc.DB.Delete(&models.Plan{}, "id = ?", planID)
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No user with that title exists"})
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No plan with that ID exists"})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"status": "success"})
+
 }
