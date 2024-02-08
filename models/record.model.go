@@ -1,6 +1,8 @@
 package models
 
 import (
+	"encoding/json"
+	"errors"
 	"time"
 
 	"github.com/google/uuid"
@@ -28,16 +30,28 @@ func (RecordHealth) TableName() string {
 	return "recordHealth"
 }
 
-// type RecordPlan struct {
-// 	ID        uuid.UUID       `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
-// 	PatientID uuid.UUID       `gorm:"type:uuid ;null" json:"patientID,omitempty"`
-// 	Patient   Patient         `gorm:"foreignKey:PatientID; " json:"patient,omitempty"`
-// 	Detail    json.RawMessage `gorm:"type:jsonb" json:"detail,omitempty"`
-// 	Mood      string          `json:"mood,omitempty"`
-// 	GetPoint  bool            `gorm:"default:false" json:"getPoint,omitempty"`
-// 	Timestamp time.Time
-// }
+type RecordPlan struct {
+	ID        uuid.UUID       `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
+	PatientID uuid.UUID       `gorm:"type:uuid ;null" json:"patientID"`
+	List      json.RawMessage `gorm:"type:json" json:"list"`
+	Mood      *string         `json:"mood"`
+	GetPoint  bool            `gorm:"default:false" json:"getPoint"`
+	CreatedAt time.Time       `json:"createAt"`
+	UpdatedAt time.Time       `json:"updateAt"`
+}
 
-// func (RecordPlan) TableName() string {
-// 	return "recordPlan"
-// }
+type List struct {
+	Name  string `json:"name"`
+	Check string `gorm:"default:false" json:"check"`
+}
+
+func (dr *List) Scan(value interface{}) error {
+	if data, ok := value.([]byte); ok {
+		return json.Unmarshal(data, dr)
+	}
+	return errors.New("failed to unmarshal List")
+}
+
+func (RecordPlan) TableName() string {
+	return "recordPlan"
+}

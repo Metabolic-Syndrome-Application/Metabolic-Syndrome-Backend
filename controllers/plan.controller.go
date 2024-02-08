@@ -208,7 +208,7 @@ func (pc *PlanController) CreatePlan(ctx *gin.Context) {
 		Description string        `json:"description,omitempty"`
 		Photo       string        `json:"photo,omitempty"`
 		Type        string        `json:"type,omitempty"`
-		Detail      models.Detail `gorm:"type:jsonb" json:"detail,omitempty"`
+		Detail      models.Detail `gorm:"type:json" json:"detail,omitempty"`
 	}{}
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
@@ -250,7 +250,7 @@ func (pc *PlanController) UpdatePlan(ctx *gin.Context) {
 		Description string        `json:"description,omitempty"`
 		Photo       string        `json:"photo,omitempty"`
 		Type        string        `json:"type,omitempty"`
-		Detail      models.Detail `gorm:"type:jsonb" json:"detail,omitempty"`
+		Detail      models.Detail `gorm:"type:json" json:"detail,omitempty"`
 	}{}
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})

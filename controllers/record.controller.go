@@ -1,7 +1,10 @@
 package controllers
 
 import (
+	"encoding/json"
+	"errors"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -618,6 +621,216 @@ func (rc *RecordController) GetOtherRecordHealthByPatientBloodPressure(ctx *gin.
 }
 
 // plan
-func (rc *RecordController) RecordPlan(ctx *gin.Context) {
+func (rc *RecordController) GetRecordPlan(ctx *gin.Context) {
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	var recordPlan models.RecordPlan
+	day := time.Now().UTC().Truncate(24 * time.Hour)
+
+	result := rc.DB.First(&recordPlan, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, day, day.Add(24*time.Hour))
+	if result.Error != nil {
+		// not fond this row
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			var patient models.Patient
+			result1 := rc.DB.Preload("Plan").First(&patient, "id = ?", currentUser.ID)
+			if result1.Error != nil {
+				ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No post with that title exists"})
+				return
+			}
+
+			today := strings.ToLower(time.Now().Weekday().String())
+
+			var list []models.List
+			for _, plan := range patient.Plan {
+				for _, value := range plan.Detail.Day {
+					if value == today {
+						for _, name := range plan.Detail.Name {
+							response := models.List{
+								Name:  name,
+								Check: "false",
+							}
+							list = append(list, response)
+						}
+						break
+					}
+
+				}
+			}
+
+			listJSON, err := json.Marshal(list)
+			if err != nil {
+				// จัดการข้อผิดพลาด
+			}
+
+			now := time.Now()
+
+			newRecordPlan := &models.RecordPlan{
+				PatientID: currentUser.ID,
+				List:      json.RawMessage(listJSON),
+				Mood:      nil,
+				GetPoint:  false,
+				CreatedAt: now,
+				UpdatedAt: now,
+			}
+
+			result2 := rc.DB.Create(&newRecordPlan)
+			if result2.Error != nil {
+				ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not create RecordPlan"})
+				return
+			}
+
+			ctx.JSON(http.StatusCreated, gin.H{"status": "success", "message": "create record plan", "data": gin.H{"record": newRecordPlan}})
+
+			// error
+		} else {
+			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "error"})
+		}
+		// already have record plan on this day
+	} else {
+		ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"record": recordPlan}})
+	}
 
 }
+
+func (rc *RecordController) GetRecordPlanList(ctx *gin.Context) {
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	var recordPlan models.RecordPlan
+	day := time.Now().UTC().Truncate(24 * time.Hour)
+
+	result := rc.DB.First(&recordPlan, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, day, day.Add(24*time.Hour))
+	if result.Error != nil {
+		// not fond this row
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			var patient models.Patient
+			result1 := rc.DB.Preload("Plan").First(&patient, "id = ?", currentUser.ID)
+			if result1.Error != nil {
+				ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No post with that title exists"})
+				return
+			}
+
+			today := strings.ToLower(time.Now().Weekday().String())
+
+			var list []models.List
+			for _, plan := range patient.Plan {
+				for _, value := range plan.Detail.Day {
+					if value == today {
+						for _, name := range plan.Detail.Name {
+							response := models.List{
+								Name:  name,
+								Check: "false",
+							}
+							list = append(list, response)
+						}
+						break
+					}
+
+				}
+			}
+
+			listJSON, err := json.Marshal(list)
+			if err != nil {
+				// จัดการข้อผิดพลาด
+			}
+
+			now := time.Now()
+
+			newRecordPlan := &models.RecordPlan{
+				PatientID: currentUser.ID,
+				List:      json.RawMessage(listJSON),
+				Mood:      nil,
+				GetPoint:  false,
+				CreatedAt: now,
+				UpdatedAt: now,
+			}
+
+			result2 := rc.DB.Create(&newRecordPlan)
+			if result2.Error != nil {
+				ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not create RecordPlan"})
+				return
+			}
+
+			ctx.JSON(http.StatusCreated, gin.H{"status": "success", "message": "create record plan", "data": gin.H{"list": newRecordPlan.List}})
+
+			// error
+		} else {
+			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "error"})
+		}
+		// already have record plan on this day
+	} else {
+		ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"list": recordPlan.List}})
+	}
+
+}
+
+func (rc *RecordController) GetRecordPlanMood(ctx *gin.Context) {
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	var recordPlan models.RecordPlan
+	day := time.Now().UTC().Truncate(24 * time.Hour)
+
+	result := rc.DB.First(&recordPlan, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, day, day.Add(24*time.Hour))
+	if result.Error != nil {
+		// not fond this row
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			var patient models.Patient
+			result1 := rc.DB.Preload("Plan").First(&patient, "id = ?", currentUser.ID)
+			if result1.Error != nil {
+				ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No post with that title exists"})
+				return
+			}
+
+			today := strings.ToLower(time.Now().Weekday().String())
+
+			var list []models.List
+			for _, plan := range patient.Plan {
+				for _, value := range plan.Detail.Day {
+					if value == today {
+						for _, name := range plan.Detail.Name {
+							response := models.List{
+								Name:  name,
+								Check: "false",
+							}
+							list = append(list, response)
+						}
+						break
+					}
+
+				}
+			}
+
+			listJSON, err := json.Marshal(list)
+			if err != nil {
+				// จัดการข้อผิดพลาด
+			}
+
+			now := time.Now()
+
+			newRecordPlan := &models.RecordPlan{
+				PatientID: currentUser.ID,
+				List:      json.RawMessage(listJSON),
+				Mood:      nil,
+				GetPoint:  false,
+				CreatedAt: now,
+				UpdatedAt: now,
+			}
+
+			result2 := rc.DB.Create(&newRecordPlan)
+			if result2.Error != nil {
+				ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not create RecordPlan"})
+				return
+			}
+
+			ctx.JSON(http.StatusCreated, gin.H{"status": "success", "message": "create record plan", "data": gin.H{"mood": newRecordPlan.Mood}})
+
+			// error
+		} else {
+			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "error"})
+		}
+		// already have record plan on this day
+	} else {
+		ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"mood": recordPlan.Mood}})
+	}
+
+}
+
+// func (rc *RecordController) UpdateRecordPlanMood(ctx *gin.Context) {
+
+// }

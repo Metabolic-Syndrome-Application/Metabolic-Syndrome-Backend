@@ -51,4 +51,9 @@ func (rc *RecordRouteController) RecordRoute(rg *gin.RouterGroup) {
 	// Get other record health record_by patient bloodPressure (Web)
 	router.GET("/health/patient/bloodPressure/:id", middleware.DeserializeUser(), rc.recordController.GetOtherRecordHealthByPatientBloodPressure)
 
+	// Create record plan (Mobile)
+	router.GET("/plan", middleware.DeserializeUser(), rc.recordController.GetRecordPlan)
+	router.GET("/plan/list", middleware.DeserializeUser(), rc.recordController.GetRecordPlanList)
+	router.GET("/plan/mood", middleware.DeserializeUser(), rc.recordController.GetRecordPlanMood)
+
 }
