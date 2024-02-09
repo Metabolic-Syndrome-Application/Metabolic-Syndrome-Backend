@@ -553,6 +553,8 @@ func (rc *RecordController) GetOtherRecordHealthByPatientType(ctx *gin.Context) 
 
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
 // plan
 func (rc *RecordController) GetRecordPlan(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
@@ -749,6 +751,66 @@ func (rc *RecordController) GetRecordPlanMood(ctx *gin.Context) {
 
 }
 
-// func (rc *RecordController) UpdateRecordPlanMood(ctx *gin.Context) {
+func (rc *RecordController) UpdateRecordPlanList(ctx *gin.Context) {
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	var recordPlan models.RecordPlan
+	day := time.Now().UTC().Truncate(24 * time.Hour)
+	result := rc.DB.First(&recordPlan, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, day, day.Add(24*time.Hour))
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
+		return
+	}
 
-// }
+	var payload = struct {
+		List json.RawMessage `gorm:"type:json" json:"list"`
+	}{}
+
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+
+	updatePlanList := &models.RecordPlan{
+		List: payload.List,
+	}
+
+	result = rc.DB.Model(&recordPlan).Updates(updatePlanList)
+	if result.Error != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update plan list"})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Update plan list success"})
+
+}
+
+func (rc *RecordController) UpdateRecordPlanMood(ctx *gin.Context) {
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	var recordPlan models.RecordPlan
+	day := time.Now().UTC().Truncate(24 * time.Hour)
+	result := rc.DB.First(&recordPlan, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, day, day.Add(24*time.Hour))
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
+		return
+	}
+
+	var payload = struct {
+		Mood *string `json:"mood"`
+	}{}
+
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+
+	updatePlanMood := &models.RecordPlan{
+		Mood: payload.Mood,
+	}
+
+	result = rc.DB.Model(&recordPlan).Updates(updatePlanMood)
+	if result.Error != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update plan mood"})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Update plan mood success"})
+
+}

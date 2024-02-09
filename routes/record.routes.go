@@ -39,5 +39,7 @@ func (rc *RecordRouteController) RecordRoute(rg *gin.RouterGroup) {
 	router.GET("/plan", middleware.DeserializeUser(), rc.recordController.GetRecordPlan)
 	router.GET("/plan/list", middleware.DeserializeUser(), rc.recordController.GetRecordPlanList)
 	router.GET("/plan/mood", middleware.DeserializeUser(), rc.recordController.GetRecordPlanMood)
+	router.PUT("/plan/list", middleware.DeserializeUser(), rc.recordController.UpdateRecordPlanList)
+	router.PUT("/plan/mood", middleware.DeserializeUser(), rc.recordController.UpdateRecordPlanMood)
 
 }
