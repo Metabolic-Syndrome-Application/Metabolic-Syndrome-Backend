@@ -559,9 +559,9 @@ func (rc *RecordController) GetOtherRecordHealthByPatientType(ctx *gin.Context) 
 func (rc *RecordController) GetRecordPlan(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	var recordPlan models.RecordPlan
-	day := time.Now().UTC().Truncate(24 * time.Hour)
+	date := time.Now().UTC().Truncate(24 * time.Hour)
 
-	result := rc.DB.First(&recordPlan, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, day, day.Add(24*time.Hour))
+	result := rc.DB.First(&recordPlan, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, date, date.Add(24*time.Hour))
 	if result.Error != nil {
 		// not fond this row
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -624,9 +624,9 @@ func (rc *RecordController) GetRecordPlan(ctx *gin.Context) {
 func (rc *RecordController) GetRecordPlanList(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	var recordPlan models.RecordPlan
-	day := time.Now().UTC().Truncate(24 * time.Hour)
+	date := time.Now().UTC().Truncate(24 * time.Hour)
 
-	result := rc.DB.First(&recordPlan, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, day, day.Add(24*time.Hour))
+	result := rc.DB.First(&recordPlan, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, date, date.Add(24*time.Hour))
 	if result.Error != nil {
 		// not fond this row
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -689,9 +689,9 @@ func (rc *RecordController) GetRecordPlanList(ctx *gin.Context) {
 func (rc *RecordController) GetRecordPlanMood(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	var recordPlan models.RecordPlan
-	day := time.Now().UTC().Truncate(24 * time.Hour)
+	date := time.Now().UTC().Truncate(24 * time.Hour)
 
-	result := rc.DB.First(&recordPlan, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, day, day.Add(24*time.Hour))
+	result := rc.DB.First(&recordPlan, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, date, date.Add(24*time.Hour))
 	if result.Error != nil {
 		// not fond this row
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -751,11 +751,37 @@ func (rc *RecordController) GetRecordPlanMood(ctx *gin.Context) {
 
 }
 
+func (rc *RecordController) GetRecordPlanMoodAll(ctx *gin.Context) {
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	var recordPlans []models.RecordPlan
+
+	result := rc.DB.Where("patient_id = ?", currentUser.ID).Find(&recordPlans)
+	if result.Error != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "error"})
+		return
+	}
+
+	type Response struct {
+		Mood *string `json:"mood"`
+		Date string  `json:"date"`
+	}
+	var data []Response
+	for _, recordPlan := range recordPlans {
+		response := Response{
+			Mood: recordPlan.Mood,
+			Date: recordPlan.CreatedAt.Format("2006-01-02"),
+		}
+		data = append(data, response)
+	}
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": data})
+
+}
+
 func (rc *RecordController) UpdateRecordPlanList(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	var recordPlan models.RecordPlan
-	day := time.Now().UTC().Truncate(24 * time.Hour)
-	result := rc.DB.First(&recordPlan, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, day, day.Add(24*time.Hour))
+	date := time.Now().UTC().Truncate(24 * time.Hour)
+	result := rc.DB.First(&recordPlan, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, date, date.Add(24*time.Hour))
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
 		return
@@ -832,8 +858,8 @@ func (rc *RecordController) UpdateRecordPlanList(ctx *gin.Context) {
 func (rc *RecordController) UpdateRecordPlanMood(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	var recordPlan models.RecordPlan
-	day := time.Now().UTC().Truncate(24 * time.Hour)
-	result := rc.DB.First(&recordPlan, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, day, day.Add(24*time.Hour))
+	date := time.Now().UTC().Truncate(24 * time.Hour)
+	result := rc.DB.First(&recordPlan, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, date, date.Add(24*time.Hour))
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
 		return
@@ -858,5 +884,131 @@ func (rc *RecordController) UpdateRecordPlanMood(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Update plan mood success"})
+
+}
+
+func (rc *RecordController) GetRecordPlanListByDate(ctx *gin.Context) {
+	dateStr := ctx.Param("date")
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	var recordPlan models.RecordPlan
+	date, _ := time.Parse("2006-01-02", dateStr)
+	result := rc.DB.First(&recordPlan, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, date, date.Add(24*time.Hour))
+	if result.Error != nil {
+		// not fond this row
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			var patient models.Patient
+			result1 := rc.DB.Preload("Plan").First(&patient, "id = ?", currentUser.ID)
+			if result1.Error != nil {
+				ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No post with that title exists"})
+				return
+			}
+
+			today := strings.ToLower(date.Weekday().String())
+
+			var list []models.List
+			for _, plan := range patient.Plan {
+				for _, value := range plan.Detail.Day {
+					if value == today {
+						for _, name := range plan.Detail.Name {
+							response := models.List{
+								Name:  name,
+								Check: "false",
+							}
+							list = append(list, response)
+						}
+						break
+					}
+
+				}
+			}
+
+			listJSON, _ := json.Marshal(list)
+			now := time.Now()
+			newRecordPlan := &models.RecordPlan{
+				PatientID: currentUser.ID,
+				List:      json.RawMessage(listJSON),
+				Mood:      nil,
+				GetPoint:  false,
+				CreatedAt: date,
+				UpdatedAt: now,
+			}
+
+			result2 := rc.DB.Create(&newRecordPlan)
+			if result2.Error != nil {
+				ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not create RecordPlan"})
+				return
+			}
+
+			ctx.JSON(http.StatusCreated, gin.H{"status": "success", "message": "create record plan", "data": gin.H{"list": newRecordPlan.List}})
+
+			// error
+		} else {
+			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "error"})
+		}
+		// already have record plan on this day
+	} else {
+		ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"list": recordPlan.List}})
+	}
+
+}
+
+func (rc *RecordController) UpdateRecordPlanListByDate(ctx *gin.Context) {
+	dateStr := ctx.Param("date")
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	var recordPlan models.RecordPlan
+	date, _ := time.Parse("2006-01-02", dateStr)
+	result := rc.DB.First(&recordPlan, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, date, date.Add(24*time.Hour))
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
+		return
+	}
+
+	var payload = struct {
+		List json.RawMessage `gorm:"type:json" json:"list"`
+	}{}
+
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+
+	updatePlanList := &models.RecordPlan{
+		List: payload.List,
+	}
+
+	result = rc.DB.Model(&recordPlan).Updates(updatePlanList)
+	if result.Error != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update plan list"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Update plan list success"})
+
+}
+
+func (rc *RecordController) GetOtherRecordPlan(ctx *gin.Context) {
+	userID := ctx.Param("id")
+	var recordPlans []models.RecordPlan
+	result := rc.DB.Where("patient_id = ?", userID).Find(&recordPlans)
+	if result.Error != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "error"})
+		return
+	}
+
+	type Response struct {
+		List json.RawMessage `gorm:"type:json" json:"list"`
+		Mood *string         `json:"mood"`
+		Date string          `json:"date"`
+	}
+	var data []Response
+	for _, recordPlan := range recordPlans {
+		response := Response{
+			List: recordPlan.List,
+			Mood: recordPlan.Mood,
+			Date: recordPlan.CreatedAt.Format("2006-01-02"),
+		}
+		data = append(data, response)
+	}
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": data})
 
 }
