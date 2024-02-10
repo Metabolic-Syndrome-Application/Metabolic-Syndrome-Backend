@@ -582,6 +582,7 @@ func (rc *RecordController) GetRecordPlan(ctx *gin.Context) {
 							response := models.List{
 								Name:  name,
 								Check: "false",
+								Type:  plan.Type,
 							}
 							list = append(list, response)
 						}
@@ -647,6 +648,7 @@ func (rc *RecordController) GetRecordPlanList(ctx *gin.Context) {
 							response := models.List{
 								Name:  name,
 								Check: "false",
+								Type:  plan.Type,
 							}
 							list = append(list, response)
 						}
@@ -712,6 +714,7 @@ func (rc *RecordController) GetRecordPlanMood(ctx *gin.Context) {
 							response := models.List{
 								Name:  name,
 								Check: "false",
+								Type:  plan.Type,
 							}
 							list = append(list, response)
 						}
@@ -913,6 +916,7 @@ func (rc *RecordController) GetRecordPlanListByDate(ctx *gin.Context) {
 							response := models.List{
 								Name:  name,
 								Check: "false",
+								Type:  plan.Type,
 							}
 							list = append(list, response)
 						}

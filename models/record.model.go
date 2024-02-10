@@ -43,6 +43,7 @@ type RecordPlan struct {
 type List struct {
 	Name  string `json:"name"`
 	Check string `gorm:"default:false" json:"check"`
+	Type  string `json:"type"`
 }
 
 func (dr *List) Scan(value interface{}) error {
