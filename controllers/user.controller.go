@@ -62,12 +62,12 @@ func (uc *UserController) UpdateProfile(ctx *gin.Context) {
 		// doctor
 	} else if currentUser.Role == "doctor" {
 		var payload = struct {
-			Prefix     string `json:"prefix,omitempty"`
-			FirstName  string `json:"firstName,omitempty"`
-			LastName   string `json:"lastName,omitempty"`
-			Gender     string `json:"gender,omitempty"`
-			Department string `json:"department,omitempty"`
-			Specialist string `json:"specialist,omitempty"`
+			Prefix     string `json:"prefix"`
+			FirstName  string `json:"firstName"`
+			LastName   string `json:"lastName"`
+			Gender     string `json:"gender"`
+			Department string `json:"department"`
+			Specialist string `json:"specialist"`
 		}{} // {} = default is null
 		if err := ctx.ShouldBindJSON(&payload); err != nil {
 			ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
@@ -98,12 +98,12 @@ func (uc *UserController) UpdateProfile(ctx *gin.Context) {
 		// staff
 	} else if currentUser.Role == "staff" {
 		var payload = struct {
-			Prefix     string `json:"prefix,omitempty"`
-			FirstName  string `json:"firstName,omitempty"`
-			LastName   string `json:"lastName,omitempty"`
-			Gender     string `json:"gender,omitempty"`
-			Department string `json:"department,omitempty"`
-			Specialist string `json:"specialist,omitempty"`
+			Prefix     string `json:"prefix"`
+			FirstName  string `json:"firstName"`
+			LastName   string `json:"lastName"`
+			Gender     string `json:"gender"`
+			Department string `json:"department"`
+			Specialist string `json:"specialist"`
 		}{} // {} = default is null
 		if err := ctx.ShouldBindJSON(&payload); err != nil {
 			ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
@@ -191,13 +191,13 @@ func (uc *UserController) GetAllUserProfile(ctx *gin.Context) {
 		}
 		type Response struct {
 			ID           uuid.UUID  `json:"id"`
-			HN           *string    `json:"hn,omitempty"`
-			FirstName    string     `json:"firstName,omitempty"`
-			LastName     string     `json:"lastName,omitempty"`
-			Gender       string     `json:"gender,omitempty"`
-			YearOfBirth  int        `json:"yearOfBirth,omitempty"`
-			Status       string     `json:"status,omitempty"`
-			MainDoctorID *uuid.UUID `gorm:"type:uuid ;null" json:"mainDoctorID,omitempty"` //TODO:ใส่เป็นชื่อหมอ
+			HN           *string    `json:"hn"`
+			FirstName    string     `json:"firstName"`
+			LastName     string     `json:"lastName"`
+			Gender       string     `json:"gender"`
+			YearOfBirth  int        `json:"yearOfBirth"`
+			Status       string     `json:"status"`
+			MainDoctorID *uuid.UUID `gorm:"type:uuid ;null" json:"mainDoctorID"` //TODO:ใส่เป็นชื่อหมอ
 		}
 		var data []Response
 		for _, patient := range patients {
@@ -227,12 +227,12 @@ func (uc *UserController) GetAllUserProfile(ctx *gin.Context) {
 		type Response struct {
 			ID         uuid.UUID `json:"id"`
 			Username   string    `gorm:"type:varchar(255);not null" json:"username"`
-			Prefix     string    `json:"prefix,omitempty"`
-			FirstName  string    `json:"firstName,omitempty"`
-			LastName   string    `json:"lastName,omitempty"`
-			Gender     string    `json:"gender,omitempty"`
-			Department string    `json:"department,omitempty"`
-			Specialist string    `json:"specialist,omitempty"`
+			Prefix     string    `json:"prefix"`
+			FirstName  string    `json:"firstName"`
+			LastName   string    `json:"lastName"`
+			Gender     string    `json:"gender"`
+			Department string    `json:"department"`
+			Specialist string    `json:"specialist"`
 			Role       string    `gorm:"type:varchar(255);not null" json:"role"`
 		}
 		var data []Response
@@ -275,13 +275,13 @@ func (uc *UserController) GetAllUserProfile(ctx *gin.Context) {
 		}
 		type Response struct {
 			ID           uuid.UUID  `json:"id"`
-			HN           *string    `json:"hn,omitempty"`
-			FirstName    string     `json:"firstName,omitempty"`
-			LastName     string     `json:"lastName,omitempty"`
-			Gender       string     `json:"gender,omitempty"`
-			YearOfBirth  int        `json:"yearOfBirth,omitempty"`
-			Status       string     `json:"status,omitempty"`
-			MainDoctorID *uuid.UUID `gorm:"type:uuid ;null" json:"mainDoctorID,omitempty"` //TODO:ใส่เป็นชื่อหมอ
+			HN           *string    `json:"hn"`
+			FirstName    string     `json:"firstName"`
+			LastName     string     `json:"lastName"`
+			Gender       string     `json:"gender"`
+			YearOfBirth  int        `json:"yearOfBirth"`
+			Status       string     `json:"status"`
+			MainDoctorID *uuid.UUID `gorm:"type:uuid ;null" json:"mainDoctorID"` //TODO:ใส่เป็นชื่อหมอ
 		}
 		var data []Response
 		for _, patient := range patients {
@@ -304,6 +304,35 @@ func (uc *UserController) GetAllUserProfile(ctx *gin.Context) {
 
 }
 
+// get profile doctor all
+
+func (uc *UserController) GetAllUserProfileDoctor(ctx *gin.Context) {
+	var doctors []models.Doctor
+	result := uc.DB.Find(&doctors)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Error fetching patient data"})
+		return
+	}
+	type Response struct {
+		ID        uuid.UUID `json:"id"`
+		Prefix    string    `json:"prefix"`
+		FirstName string    `json:"firstName"`
+		LastName  string    `json:"lastName"`
+	}
+	var data []Response
+	for _, doctor := range doctors {
+		response := Response{
+			ID:        doctor.ID,
+			Prefix:    doctor.Prefix,
+			FirstName: doctor.FirstName,
+			LastName:  doctor.LastName,
+		}
+		data = append(data, response)
+	}
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"users": data}})
+
+}
+
 // update and create profile other user
 
 func (uc *UserController) UpdateOtherProfile(ctx *gin.Context) {
@@ -321,21 +350,21 @@ func (uc *UserController) UpdateOtherProfile(ctx *gin.Context) {
 		}
 
 		var payload = struct {
-			HN                 *string    `json:"hn,omitempty"`
-			FirstName          string     `json:"firstName,omitempty"`
-			LastName           string     `json:"lastName,omitempty"`
-			YearOfBirth        int        `json:"yearOfBirth,omitempty"`
-			Gender             string     `json:"gender,omitempty"`
-			MainDoctorID       *uuid.UUID `gorm:"type:uuid;null" json:"mainDoctorID,omitempty"`
-			AssistanceDoctorID *uuid.UUID `gorm:"type:uuid;null" json:"assistanceDoctorID,omitempty"`
+			HN                 *string    `json:"hn"`
+			FirstName          string     `json:"firstName"`
+			LastName           string     `json:"lastName"`
+			YearOfBirth        int        `json:"yearOfBirth"`
+			Gender             string     `json:"gender"`
+			MainDoctorID       *uuid.UUID `gorm:"type:uuid;null" json:"mainDoctorID"`
+			AssistanceDoctorID *uuid.UUID `gorm:"type:uuid;null" json:"assistanceDoctorID"`
 			DiseaseRisk        struct {
 				Diabetes       string `json:"diabetes"`
 				Hyperlipidemia string `json:"hyperlipidemia"`
 				Hypertension   string `json:"hypertension"`
 				Obesity        string `json:"obesity"`
 			} `json:"diseaseRisk"`
-			PlanID pq.StringArray `gorm:"type:uuid[];column:plan_id" json:"planID,omitempty"`
-			Status string         `gorm:"default:'in process'" json:"status,omitempty"`
+			PlanID pq.StringArray `gorm:"type:uuid[];column:plan_id" json:"planID"`
+			Status string         `gorm:"default:'in process'" json:"status"`
 		}{}
 
 		if err := ctx.ShouldBindJSON(&payload); err != nil {
@@ -397,12 +426,12 @@ func (uc *UserController) UpdateOtherProfile(ctx *gin.Context) {
 			return
 		}
 		var payload = struct {
-			Prefix     string `json:"prefix,omitempty"`
-			FirstName  string `json:"firstName,omitempty"`
-			LastName   string `json:"lastName,omitempty"`
-			Gender     string `json:"gender,omitempty"`
-			Department string `json:"department,omitempty"`
-			Specialist string `json:"specialist,omitempty"`
+			Prefix     string `json:"prefix"`
+			FirstName  string `json:"firstName"`
+			LastName   string `json:"lastName"`
+			Gender     string `json:"gender"`
+			Department string `json:"department"`
+			Specialist string `json:"specialist"`
 		}{} // {} = default is null
 		if err := ctx.ShouldBindJSON(&payload); err != nil {
 			ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
@@ -432,12 +461,12 @@ func (uc *UserController) UpdateOtherProfile(ctx *gin.Context) {
 			return
 		}
 		var payload = struct {
-			Prefix     string `json:"prefix,omitempty"`
-			FirstName  string `json:"firstName,omitempty"`
-			LastName   string `json:"lastName,omitempty"`
-			Gender     string `json:"gender,omitempty"`
-			Department string `json:"department,omitempty"`
-			Specialist string `json:"specialist,omitempty"`
+			Prefix     string `json:"prefix"`
+			FirstName  string `json:"firstName"`
+			LastName   string `json:"lastName"`
+			Gender     string `json:"gender"`
+			Department string `json:"department"`
+			Specialist string `json:"specialist"`
 		}{} // {} = default is null
 		if err := ctx.ShouldBindJSON(&payload); err != nil {
 			ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
