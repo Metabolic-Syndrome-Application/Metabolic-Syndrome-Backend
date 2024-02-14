@@ -22,6 +22,8 @@ var (
 	PlanRouteController      routes.PlanRouteController
 	RecordController         controllers.RecordController
 	RecordRouteController    routes.RecordRouteController
+	ChallengeController      controllers.ChallengeController
+	ChallengeRouteController routes.ChallengeRouteController
 )
 
 func init() {
@@ -46,6 +48,9 @@ func init() {
 
 	RecordController = controllers.NewRecordController(initializers.DB)
 	RecordRouteController = routes.NewRecordRouteController(RecordController)
+
+	ChallengeController = controllers.NewChallengeController(initializers.DB)
+	ChallengeRouteController = routes.NewChallengeRouteController(ChallengeController)
 
 	server = gin.Default()
 }
@@ -72,5 +77,6 @@ func main() {
 	ScreeningRouteController.ScreeningRoute(router)
 	PlanRouteController.PlanRoute(router)
 	RecordRouteController.RecordRoute(router)
+	ChallengeRouteController.ChallengeRoute(router)
 	log.Fatal(server.Run(":" + config.ServerPort))
 }

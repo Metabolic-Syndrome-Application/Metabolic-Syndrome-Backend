@@ -581,7 +581,7 @@ func (rc *RecordController) GetRecordPlan(ctx *gin.Context) {
 						for _, name := range plan.Detail.Name {
 							response := models.List{
 								Name:  name,
-								Check: "false",
+								Check: false,
 								Type:  plan.Type,
 							}
 							list = append(list, response)
@@ -647,7 +647,7 @@ func (rc *RecordController) GetRecordPlanList(ctx *gin.Context) {
 						for _, name := range plan.Detail.Name {
 							response := models.List{
 								Name:  name,
-								Check: "false",
+								Check: false,
 								Type:  plan.Type,
 							}
 							list = append(list, response)
@@ -713,7 +713,7 @@ func (rc *RecordController) GetRecordPlanMood(ctx *gin.Context) {
 						for _, name := range plan.Detail.Name {
 							response := models.List{
 								Name:  name,
-								Check: "false",
+								Check: false,
 								Type:  plan.Type,
 							}
 							list = append(list, response)
@@ -758,7 +758,7 @@ func (rc *RecordController) GetRecordPlanMoodAll(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	var recordPlans []models.RecordPlan
 
-	result := rc.DB.Where("patient_id = ?", currentUser.ID).Find(&recordPlans)
+	result := rc.DB.Order("created_at DESC").Where("patient_id = ?", currentUser.ID).Find(&recordPlans)
 	if result.Error != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "error"})
 		return
@@ -818,7 +818,7 @@ func (rc *RecordController) UpdateRecordPlanList(ctx *gin.Context) {
 
 	allChecked := true
 	for _, listItem := range listData {
-		if listItem.Check != "true" {
+		if listItem.Check != true {
 			allChecked = false
 			break
 		}
@@ -915,7 +915,7 @@ func (rc *RecordController) GetRecordPlanListByDate(ctx *gin.Context) {
 						for _, name := range plan.Detail.Name {
 							response := models.List{
 								Name:  name,
-								Check: "false",
+								Check: false,
 								Type:  plan.Type,
 							}
 							list = append(list, response)
@@ -993,7 +993,7 @@ func (rc *RecordController) UpdateRecordPlanListByDate(ctx *gin.Context) {
 func (rc *RecordController) GetOtherRecordPlan(ctx *gin.Context) {
 	userID := ctx.Param("id")
 	var recordPlans []models.RecordPlan
-	result := rc.DB.Where("patient_id = ?", userID).Find(&recordPlans)
+	result := rc.DB.Order("created_at DESC").Where("patient_id = ?", userID).Find(&recordPlans)
 	if result.Error != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "error"})
 		return

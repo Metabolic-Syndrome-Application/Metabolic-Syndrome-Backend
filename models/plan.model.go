@@ -58,8 +58,8 @@ type Plan struct {
 	Photo       string    `json:"photo"`
 	Type        string    `json:"type"`
 	Detail      Detail    `gorm:"type:json" json:"detail"`
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
 }
 
 type Detail struct {

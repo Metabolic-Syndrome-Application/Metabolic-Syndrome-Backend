@@ -17,8 +17,8 @@ type User struct {
 	Role      string    `gorm:"type:varchar(255);not null" json:"role"`
 	Verified  bool      `gorm:"not null" json:"verified"`
 	Type      string    `gorm:"not null" json:"type"`
-	CreatedAt time.Time `json:"createAt"`
-	UpdatedAt time.Time `json:"updateAt"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 func (User) TableName() string {
@@ -75,7 +75,7 @@ type Patient struct {
 	PlanID             pq.StringArray `gorm:"type:uuid[];column:plan_id" json:"planID"`
 	Plan               []Plan         `gorm:"many2many:patient_plan;association_foreignkey:ID;joinForeignKey:PatientID;References:ID;joinReferences:PlanID" json:"Plan"`
 	ChallengeID        *uuid.UUID     `gorm:"type:uuid ;null" json:"challengeID"`
-	Challenge          Challenge      `gorm:"foreignKey:ChallengeID;" json:"challenge"`
+	Challenge          DairyChallenge `gorm:"foreignKey:ChallengeID;" json:"challenge"`
 	CollectPoints      int            `json:"collectPoints"`
 	Status             string         `gorm:"default:'in process' " json:"status"`
 	UpdatedAt          time.Time      `json:"updateAt"`
@@ -119,15 +119,6 @@ func (Patient) TableName() string {
 	return "patient"
 }
 
-type Challenge struct {
-	ChallengeID uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
-	UpdatedAt   time.Time `json:"updateAt"`
-}
-
-func (Challenge) TableName() string {
-	return "challenge"
-}
-
 type SignUpInput struct {
 	Username        string `json:"username" binding:"required"`
 	Password        string `json:"password" binding:"required"`
@@ -145,6 +136,6 @@ type UserResponse struct {
 	Username  string    `gorm:"type:varchar(255);not null" json:"username"`
 	Role      string    `json:"role"`
 	Photo     string    `json:"photo"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }

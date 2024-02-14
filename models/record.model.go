@@ -36,13 +36,13 @@ type RecordPlan struct {
 	List      json.RawMessage `gorm:"type:json" json:"list"`
 	Mood      *string         `json:"mood"`
 	GetPoint  bool            `gorm:"default:false" json:"getPoint"`
-	CreatedAt time.Time       `json:"createAt"`
-	UpdatedAt time.Time       `json:"updateAt"`
+	CreatedAt time.Time       `json:"createdAt"`
+	UpdatedAt time.Time       `json:"updatedAt"`
 }
 
 type List struct {
 	Name  string `json:"name"`
-	Check string `gorm:"default:false" json:"check"`
+	Check bool   `gorm:"default:false" json:"check"`
 	Type  string `json:"type"`
 }
 
