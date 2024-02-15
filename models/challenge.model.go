@@ -10,8 +10,13 @@ import (
 
 // ภารกิจทั่วไป
 type DairyChallenge struct {
-	ID        uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
-	UpdatedAt time.Time `json:"updateAt"`
+	ID        uuid.UUID       `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
+	Detail    json.RawMessage `gorm:"type:json" json:"detail"`
+	Points    int             `json:"points"`
+	Status    string          `gorm:"default:'active' " json:"status"`
+	LimitTime int             `json:"limitTime"`
+	CreatedAt time.Time       `json:"createdAt"`
+	UpdatedAt time.Time       `json:"updateAt"`
 }
 
 func (DairyChallenge) TableName() string {
@@ -25,7 +30,6 @@ type QuizChallenge struct {
 	Choices   json.RawMessage `gorm:"type:json" json:"choices"`
 	Points    int             `json:"points"`
 	LimitTime int             `json:"limitTime"`
-	Status    string          `gorm:"default:'active' " json:"status"`
 	CreatedAt time.Time       `json:"createdAt"`
 	UpdatedAt time.Time       `json:"updatedAt"`
 }
