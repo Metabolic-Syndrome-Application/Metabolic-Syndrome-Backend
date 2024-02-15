@@ -23,6 +23,8 @@ type QuizChallenge struct {
 	ID        uuid.UUID       `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
 	Question  string          `json:"question"`
 	Choices   json.RawMessage `gorm:"type:json" json:"choices"`
+	Point     int             `json:"point"`
+	Time      int             `json:"time"`
 	Status    string          `gorm:"default:'active' " json:"status"`
 	CreatedAt time.Time       `json:"createdAt"`
 	UpdatedAt time.Time       `json:"updatedAt"`

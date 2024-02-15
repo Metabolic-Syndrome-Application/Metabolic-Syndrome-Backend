@@ -24,6 +24,8 @@ func (cc *ChallengeController) CreateQuizChallenge(ctx *gin.Context) {
 	var payload = struct {
 		Question string          `json:"question"`
 		Choices  json.RawMessage `gorm:"type:json" json:"choices"`
+		Point    int             `json:"point"`
+		Time     int             `json:"time"`
 	}{}
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
@@ -32,6 +34,8 @@ func (cc *ChallengeController) CreateQuizChallenge(ctx *gin.Context) {
 	newQuizChallenge := &models.QuizChallenge{
 		Question: payload.Question,
 		Choices:  payload.Choices,
+		Point:    payload.Point,
+		Time:     payload.Time,
 	}
 	result1 := cc.DB.Create(&newQuizChallenge)
 	if result1.Error != nil {
