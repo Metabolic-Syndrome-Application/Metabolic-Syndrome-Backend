@@ -83,6 +83,18 @@ func (cc *ChallengeController) UpdateQuizChallenge(ctx *gin.Context) {
 
 }
 
+// delete quiz challenge
+func (cc *ChallengeController) DeleteQuizChallenge(ctx *gin.Context) {
+	quizID := ctx.Param("id")
+	result := cc.DB.Delete(&models.QuizChallenge{}, "id = ?", quizID)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No quiz with that ID exists"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Delete Quiz Challenge success"})
+}
+
 // get 1 quiz challenge
 func (cc *ChallengeController) GetQuizChallenge(ctx *gin.Context) {
 	quizID := ctx.Param("id")
