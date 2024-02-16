@@ -24,4 +24,9 @@ func (cc *ChallengeRouteController) ChallengeRoute(rg *gin.RouterGroup) {
 	router.GET("/quiz/:id", middleware.DeserializeUser(), cc.challengeController.GetQuizChallenge)
 	router.GET("/quiz/all", middleware.DeserializeUser(), cc.challengeController.GetAllQuizChallenge)
 
+	//Mobile
+	router.GET("/quiz/check-today", middleware.DeserializeUser(), cc.challengeController.CheckQuizToday)
+	router.GET("/quiz/random", middleware.DeserializeUser(), cc.challengeController.GetRandomQuiz)
+	router.GET("/quiz/answer", middleware.DeserializeUser(), cc.challengeController.GetPointQuiz)
+
 }

@@ -56,3 +56,14 @@ func (dr *List) Scan(value interface{}) error {
 func (RecordPlan) TableName() string {
 	return "recordPlan"
 }
+
+type RecordQuiz struct {
+	ID              uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
+	PatientID       uuid.UUID `gorm:"type:uuid ;null" json:"patientID"`
+	QuizChallengeID uuid.UUID `gorm:"type:uuid ;null" json:"quizChallengeID"`
+	CreatedAt       time.Time `json:"createdAt"`
+}
+
+func (RecordQuiz) TableName() string {
+	return "recordQuiz"
+}

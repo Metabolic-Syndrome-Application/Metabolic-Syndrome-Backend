@@ -845,7 +845,7 @@ func (rc *RecordController) UpdateRecordPlanList(ctx *gin.Context) {
 		}
 
 		updatePoint := &models.Patient{
-			CollectPoints: patient.CollectPoints + 50,
+			CollectPoints: patient.CollectPoints + 100,
 		}
 		result = rc.DB.Model(&patient).Updates(updatePoint)
 		if result.Error != nil {

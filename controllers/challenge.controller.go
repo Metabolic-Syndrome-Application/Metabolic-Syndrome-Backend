@@ -2,7 +2,9 @@ package controllers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -121,6 +123,69 @@ func (cc *ChallengeController) GetAllQuizChallenge(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"quiz": data}})
 }
 
+// mobile
+
+// Check Quiz Today
+func (cc *ChallengeController) CheckQuizToday(ctx *gin.Context) {
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	var recordQuiz models.RecordQuiz
+	date := time.Now().UTC().Truncate(24 * time.Hour)
+	result := cc.DB.First(&recordQuiz, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, date, date.Add(24*time.Hour))
+	if result.Error != nil {
+		// not fond this row
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "You haven't done the quiz today", "check": false})
+		} else {
+			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "error"})
+		}
+	} else {
+		ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "You have already done today's quiz", "check": true})
+
+	}
+}
+
 // get random quiz
+func (cc *ChallengeController) GetRandomQuiz(ctx *gin.Context) {
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	var quiz models.QuizChallenge
+	cc.DB.Order("RANDOM()").Limit(1).Find(&quiz)
+	createQuizToday := &models.RecordQuiz{
+		PatientID:       currentUser.ID,
+		QuizChallengeID: quiz.ID,
+	}
+	cc.DB.Create(&createQuizToday)
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"quiz": quiz}})
+}
 
 // get point quiz challenge
+func (cc *ChallengeController) GetPointQuiz(ctx *gin.Context) {
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	var patient models.Patient
+	result := cc.DB.First(&patient, "id = ?", currentUser.ID)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
+		return
+	}
+	var payload = struct {
+		IsCorrect bool `json:"isCorrect"`
+	}{}
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+	if payload.IsCorrect == true {
+		updatePoint := &models.Patient{
+			CollectPoints: patient.CollectPoints + 150,
+		}
+		result = cc.DB.Model(&patient).Updates(updatePoint)
+		if result.Error != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update point"})
+			return
+		}
+		ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "correct, get 150 points", "result": "correct"})
+
+	} else {
+		ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "incorrect, don't get point", "result": "incorrect"})
+
+	}
+}
