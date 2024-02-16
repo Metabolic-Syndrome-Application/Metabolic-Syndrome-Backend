@@ -9,7 +9,7 @@ import (
 )
 
 // ภารกิจทั่วไป
-type DairyChallenge struct {
+type DailyChallenge struct {
 	ID        uuid.UUID       `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
 	Detail    json.RawMessage `gorm:"type:json" json:"detail"`
 	Points    int             `json:"points"`
@@ -19,8 +19,8 @@ type DairyChallenge struct {
 	UpdatedAt time.Time       `json:"updateAt"`
 }
 
-func (DairyChallenge) TableName() string {
-	return "dairyChallenge"
+func (DailyChallenge) TableName() string {
+	return "dailyChallenge"
 }
 
 // ตอบคำถามประจำวัน

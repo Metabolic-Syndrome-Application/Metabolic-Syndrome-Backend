@@ -75,7 +75,7 @@ type Patient struct {
 	PlanID             pq.StringArray `gorm:"type:uuid[];column:plan_id" json:"planID"`
 	Plan               []Plan         `gorm:"many2many:patient_plan;association_foreignkey:ID;joinForeignKey:PatientID;References:ID;joinReferences:PlanID" json:"Plan"`
 	ChallengeID        *uuid.UUID     `gorm:"type:uuid ;null" json:"challengeID"`
-	Challenge          DairyChallenge `gorm:"foreignKey:ChallengeID;" json:"challenge"`
+	Challenge          DailyChallenge `gorm:"foreignKey:ChallengeID;" json:"challenge"`
 	CollectPoints      int            `json:"collectPoints"`
 	Status             string         `gorm:"default:'in process' " json:"status"`
 	UpdatedAt          time.Time      `json:"updateAt"`

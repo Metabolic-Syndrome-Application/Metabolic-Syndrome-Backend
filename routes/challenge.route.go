@@ -17,6 +17,11 @@ func NewChallengeRouteController(challengeController controllers.ChallengeContro
 func (cc *ChallengeRouteController) ChallengeRoute(rg *gin.RouterGroup) {
 
 	router := rg.Group("challenge")
+
+	//Web
 	router.POST("/quiz", middleware.DeserializeUser(), cc.challengeController.CreateQuizChallenge)
+	router.PUT("/quiz/:id", middleware.DeserializeUser(), cc.challengeController.UpdateQuizChallenge)
+	router.GET("/quiz/:id", middleware.DeserializeUser(), cc.challengeController.GetQuizChallenge)
+	router.GET("/quiz/all", middleware.DeserializeUser(), cc.challengeController.GetAllQuizChallenge)
 
 }

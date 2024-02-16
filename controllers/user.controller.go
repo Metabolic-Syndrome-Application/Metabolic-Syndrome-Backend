@@ -268,7 +268,7 @@ func (uc *UserController) GetAllUserProfile(ctx *gin.Context) {
 
 	} else if currentUser.Role == "doctor" {
 		var patients []models.Patient
-		result := uc.DB.Where("main_doctor_id = ? AND hn IS NOT NULL AND hn != ''", currentUser.ID).Find(&patients)
+		result := uc.DB.Where("(main_doctor_id = ? OR assistance_doctor_id = ? ) AND hn IS NOT NULL AND hn != ''", currentUser.ID, currentUser.ID).Find(&patients)
 		if result.Error != nil {
 			ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Error fetching doctor data"})
 			return
@@ -304,7 +304,7 @@ func (uc *UserController) GetAllUserProfile(ctx *gin.Context) {
 
 }
 
-// get profile doctor all
+// get profile doctor all (dropdown maindoctor/assistancedoctor)
 
 func (uc *UserController) GetAllUserProfileDoctor(ctx *gin.Context) {
 	var doctors []models.Doctor
