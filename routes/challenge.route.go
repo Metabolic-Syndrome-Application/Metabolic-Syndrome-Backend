@@ -18,6 +18,8 @@ func (cc *ChallengeRouteController) ChallengeRoute(rg *gin.RouterGroup) {
 
 	router := rg.Group("challenge")
 
+	// quiz
+
 	//Web
 	router.POST("/quiz", middleware.DeserializeUser(), cc.challengeController.CreateQuizChallenge)
 	router.PUT("/quiz/:id", middleware.DeserializeUser(), cc.challengeController.UpdateQuizChallenge)
@@ -30,4 +32,12 @@ func (cc *ChallengeRouteController) ChallengeRoute(rg *gin.RouterGroup) {
 	router.GET("/quiz/random", middleware.DeserializeUser(), cc.challengeController.GetRandomQuiz)
 	router.GET("/quiz/answer", middleware.DeserializeUser(), cc.challengeController.GetPointQuiz)
 
+	// daily
+
+	//Web
+	router.POST("/daily", middleware.DeserializeUser(), cc.challengeController.CreateDailyChallenge)
+	router.PUT("/daily/:id", middleware.DeserializeUser(), cc.challengeController.UpdateDailyChallenge)
+	// router.GET("/daily/:id", middleware.DeserializeUser(), cc.challengeController)
+	// router.DELETE("/daily/:id", middleware.DeserializeUser(), cc.challengeController)
+	// router.GET("/daily/all", middleware.DeserializeUser(), cc.challengeController)
 }

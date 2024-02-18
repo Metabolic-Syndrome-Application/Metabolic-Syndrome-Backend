@@ -10,13 +10,16 @@ import (
 
 // ภารกิจทั่วไป
 type DailyChallenge struct {
-	ID        uuid.UUID       `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
-	Detail    json.RawMessage `gorm:"type:json" json:"detail"`
-	Points    int             `json:"points"`
-	Status    string          `gorm:"default:'active' " json:"status"`
-	LimitTime int             `json:"limitTime"`
-	CreatedAt time.Time       `json:"createdAt"`
-	UpdatedAt time.Time       `json:"updateAt"`
+	ID          uuid.UUID       `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
+	Name        string          `json:"name"`
+	Description string          `json:"description"`
+	Photo       string          `json:"photo"`
+	Detail      json.RawMessage `gorm:"type:json" json:"detail"`
+	Points      int             `json:"points"`
+	Status      string          `gorm:"default:'active' " json:"status"`
+	NumDays     int             `json:"numDays"`
+	CreatedAt   time.Time       `json:"createdAt"`
+	UpdatedAt   time.Time       `json:"updateAt"`
 }
 
 func (DailyChallenge) TableName() string {

@@ -22,6 +22,8 @@ func NewChallengeController(DB *gorm.DB) ChallengeController {
 
 // quiz
 
+//web
+
 // create quiz challenge
 func (cc *ChallengeController) CreateQuizChallenge(ctx *gin.Context) {
 	var payload = struct {
@@ -200,4 +202,85 @@ func (cc *ChallengeController) GetPointQuiz(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "incorrect, don't get point", "result": "incorrect"})
 
 	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+// daily
+
+// web
+
+// Create daily
+func (cc *ChallengeController) CreateDailyChallenge(ctx *gin.Context) {
+	var payload = struct {
+		Name        string          `json:"name"`
+		Description string          `json:"description"`
+		Photo       string          `json:"photo"`
+		Detail      json.RawMessage `gorm:"type:json" json:"detail"`
+		Points      int             `json:"points"`
+		NumDays     int             `json:"numDays"`
+	}{}
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+
+	var daily models.DailyChallenge
+	existingDaily := cc.DB.First(&daily, "name = ?", payload.Name)
+	if existingDaily.Error == nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "This daily's name is already in use"})
+		return
+	}
+	newDaily := models.DailyChallenge{
+		Name:        payload.Name,
+		Description: payload.Description,
+		Photo:       payload.Photo,
+		Detail:      payload.Detail,
+		Points:      payload.Points,
+		NumDays:     payload.NumDays,
+	}
+	if err := cc.DB.Create(&newDaily).Error; err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not create daily"})
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, gin.H{"status": "success", "message": "Create daily success"})
+}
+
+// Update Pdaily
+func (cc *ChallengeController) UpdateDailyChallenge(ctx *gin.Context) {
+	dailyID := ctx.Param("id")
+	var daily models.DailyChallenge
+	result := cc.DB.First(&daily, "id = ?", dailyID)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
+		return
+	}
+	var payload = struct {
+		Name        string          `json:"name"`
+		Description string          `json:"description"`
+		Photo       string          `json:"photo"`
+		Detail      json.RawMessage `gorm:"type:json" json:"detail"`
+		Points      int             `json:"points"`
+		NumDays     int             `json:"numDays"`
+		Status      string          `json:"status"`
+	}{}
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+	updateDaily := models.DailyChallenge{
+		Name:        payload.Name,
+		Description: payload.Description,
+		Photo:       payload.Photo,
+		Detail:      payload.Detail,
+		Points:      payload.Points,
+		NumDays:     payload.NumDays,
+		Status:      payload.Status,
+	}
+	if err := cc.DB.Model(&daily).Updates(updateDaily).Error; err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update daily"})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Update daily success"})
 }
