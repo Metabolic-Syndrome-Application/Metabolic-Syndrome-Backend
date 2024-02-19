@@ -37,7 +37,7 @@ func (cc *ChallengeRouteController) ChallengeRoute(rg *gin.RouterGroup) {
 	//Web
 	router.POST("/daily", middleware.DeserializeUser(), cc.challengeController.CreateDailyChallenge)
 	router.PUT("/daily/:id", middleware.DeserializeUser(), cc.challengeController.UpdateDailyChallenge)
-	// router.GET("/daily/:id", middleware.DeserializeUser(), cc.challengeController)
-	// router.DELETE("/daily/:id", middleware.DeserializeUser(), cc.challengeController)
+	router.GET("/daily/:id", middleware.DeserializeUser(), cc.challengeController.GetDailyChallenge)
+	router.DELETE("/daily/:id", middleware.DeserializeUser(), cc.challengeController.DeleteDailyChallenge)
 	// router.GET("/daily/all", middleware.DeserializeUser(), cc.challengeController)
 }

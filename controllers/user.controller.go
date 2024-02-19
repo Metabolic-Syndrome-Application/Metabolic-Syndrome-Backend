@@ -26,12 +26,13 @@ func (uc *UserController) UpdateProfile(ctx *gin.Context) {
 	// patient
 	if currentUser.Role == "patient" {
 		var payload = struct {
-			Alias       string `json:"alias"`
-			FirstName   string `json:"firstName"`
-			LastName    string `json:"lastName"`
-			YearOfBirth int    `json:"yearOfBirth"`
-			Gender      string `json:"gender"`
-			Photo       string `json:"photo"`
+			Alias       string     `json:"alias"`
+			FirstName   string     `json:"firstName"`
+			LastName    string     `json:"lastName"`
+			YearOfBirth int        `json:"yearOfBirth"`
+			Gender      string     `json:"gender"`
+			Photo       string     `json:"photo"`
+			ChallengeID *uuid.UUID `gorm:"type:uuid ;null" json:"challengeID"`
 		}{} // {} = default is null
 		if err := ctx.ShouldBindJSON(&payload); err != nil {
 			ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
@@ -43,6 +44,16 @@ func (uc *UserController) UpdateProfile(ctx *gin.Context) {
 			ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No post with that title exists"})
 			return
 		}
+
+		if updateProfilePatient.ChallengeID != payload.ChallengeID {
+			var dailyChallenge models.DailyChallenge
+			uc.DB.First(&dailyChallenge, "id = ?", payload.ChallengeID)
+			updateDaily := &models.DailyChallenge{
+				Participants: dailyChallenge.Participants + 1,
+			}
+			uc.DB.Model(&dailyChallenge).Updates(updateDaily)
+		}
+
 		updatePatient := &models.Patient{
 			Alias:       payload.Alias,
 			FirstName:   payload.FirstName,
@@ -50,6 +61,7 @@ func (uc *UserController) UpdateProfile(ctx *gin.Context) {
 			YearOfBirth: payload.YearOfBirth,
 			Gender:      payload.Gender,
 			Photo:       payload.Photo,
+			ChallengeID: payload.ChallengeID,
 		}
 
 		a := uc.DB.Model(&updateProfilePatient).Updates(updatePatient)

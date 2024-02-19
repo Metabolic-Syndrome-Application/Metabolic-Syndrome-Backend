@@ -247,7 +247,7 @@ func (cc *ChallengeController) CreateDailyChallenge(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, gin.H{"status": "success", "message": "Create daily success"})
 }
 
-// Update Pdaily
+// Update daily
 func (cc *ChallengeController) UpdateDailyChallenge(ctx *gin.Context) {
 	dailyID := ctx.Param("id")
 	var daily models.DailyChallenge
@@ -283,4 +283,37 @@ func (cc *ChallengeController) UpdateDailyChallenge(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Update daily success"})
+}
+
+// Get 1 daily
+func (cc *ChallengeController) GetDailyChallenge(ctx *gin.Context) {
+	dailyID := ctx.Param("id")
+	var daily models.DailyChallenge
+	result := cc.DB.First(&daily, "id = ?", dailyID)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"daily": daily}})
+
+}
+
+// Delete daily
+func (cc *ChallengeController) DeleteDailyChallenge(ctx *gin.Context) {
+	dailyID := ctx.Param("id")
+
+	// find patient that have this dailyID
+	if err := cc.DB.Model(&models.Patient{}).Where("challenge_id = ?", dailyID).Update("challenge_id", nil).Error; err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "fail", "message": "error"})
+		return
+	}
+
+	// delete the daily
+	result := cc.DB.Delete(&models.DailyChallenge{}, "id = ?", dailyID)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No daily with that ID exists"})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"status": "success"})
+
 }
