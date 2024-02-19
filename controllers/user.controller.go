@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -45,13 +46,16 @@ func (uc *UserController) UpdateProfile(ctx *gin.Context) {
 			return
 		}
 
-		if updateProfilePatient.ChallengeID != payload.ChallengeID {
+		if *updateProfilePatient.ChallengeID != *payload.ChallengeID {
+			fmt.Println(updateProfilePatient.ChallengeID, payload.ChallengeID)
 			var dailyChallenge models.DailyChallenge
-			uc.DB.First(&dailyChallenge, "id = ?", payload.ChallengeID)
-			updateDaily := &models.DailyChallenge{
-				Participants: dailyChallenge.Participants + 1,
+			result := uc.DB.First(&dailyChallenge, "id = ?", payload.ChallengeID)
+			if result.Error == nil {
+				updateDaily := &models.DailyChallenge{
+					Participants: dailyChallenge.Participants + 1,
+				}
+				uc.DB.Model(&dailyChallenge).Updates(updateDaily)
 			}
-			uc.DB.Model(&dailyChallenge).Updates(updateDaily)
 		}
 
 		updatePatient := &models.Patient{

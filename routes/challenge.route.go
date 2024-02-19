@@ -30,7 +30,7 @@ func (cc *ChallengeRouteController) ChallengeRoute(rg *gin.RouterGroup) {
 	//Mobile
 	router.GET("/quiz/check-today", middleware.DeserializeUser(), cc.challengeController.CheckQuizToday)
 	router.GET("/quiz/random", middleware.DeserializeUser(), cc.challengeController.GetRandomQuiz)
-	router.GET("/quiz/answer", middleware.DeserializeUser(), cc.challengeController.GetPointQuiz)
+	router.POST("/quiz/answer", middleware.DeserializeUser(), cc.challengeController.GetPointQuiz)
 
 	// daily
 
