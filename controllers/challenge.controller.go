@@ -213,12 +213,12 @@ func (cc *ChallengeController) GetPointQuiz(ctx *gin.Context) {
 // Create daily
 func (cc *ChallengeController) CreateDailyChallenge(ctx *gin.Context) {
 	var payload = struct {
-		Name        string          `json:"name"`
-		Description string          `json:"description"`
-		Photo       string          `json:"photo"`
-		Detail      json.RawMessage `gorm:"type:json" json:"detail"`
-		Points      int             `json:"points"`
-		NumDays     int             `json:"numDays"`
+		Name        string        `json:"name"`
+		Description string        `json:"description"`
+		Photo       string        `json:"photo"`
+		Detail      models.Detail `gorm:"type:json" json:"detail"`
+		Points      int           `json:"points"`
+		NumDays     int           `json:"numDays"`
 	}{}
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
@@ -257,13 +257,13 @@ func (cc *ChallengeController) UpdateDailyChallenge(ctx *gin.Context) {
 		return
 	}
 	var payload = struct {
-		Name        string          `json:"name"`
-		Description string          `json:"description"`
-		Photo       string          `json:"photo"`
-		Detail      json.RawMessage `gorm:"type:json" json:"detail"`
-		Points      int             `json:"points"`
-		NumDays     int             `json:"numDays"`
-		Status      string          `json:"status"`
+		Name        string        `json:"name"`
+		Description string        `json:"description"`
+		Photo       string        `json:"photo"`
+		Detail      models.Detail `gorm:"type:json" json:"detail"`
+		Points      int           `json:"points"`
+		NumDays     int           `json:"numDays"`
+		Status      string        `json:"status"`
 	}{}
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
@@ -316,4 +316,158 @@ func (cc *ChallengeController) DeleteDailyChallenge(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, gin.H{"status": "success"})
 
+}
+
+// Get all daily
+func (cc *ChallengeController) GetAllDailyChallenge(ctx *gin.Context) {
+	var dailys []models.DailyChallenge
+	result := cc.DB.Find(&dailys)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "not have daily data"})
+		return
+	}
+	type Response struct {
+		ID      uuid.UUID `json:"id"`
+		Name    string    `json:"name"`
+		Points  int       `json:"points"`
+		NumDays int       `json:"numDays"`
+		Status  string    `json:"status"`
+	}
+	var data []Response
+	for _, daily := range dailys {
+		response := Response{
+			ID:      daily.ID,
+			Name:    daily.Name,
+			Points:  daily.Points,
+			NumDays: daily.NumDays,
+			Status:  daily.Status,
+		}
+		data = append(data, response)
+	}
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"daily": data}})
+}
+
+// mobile
+
+// Get all daily active (except my daily)
+func (cc *ChallengeController) GetAllActiveDailyChallenge(ctx *gin.Context) {
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	var patient models.Patient
+	cc.DB.First(&patient, "id = ?", currentUser.ID)
+	var dailys []models.DailyChallenge
+	result := cc.DB.Where("status = 'active' AND id != ?", patient.ChallengeID).Find(&dailys)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "not have daily data"})
+		return
+	}
+	type Response struct {
+		ID      uuid.UUID `json:"id"`
+		Name    string    `json:"name"`
+		Points  int       `json:"points"`
+		NumDays int       `json:"numDays"`
+	}
+	var data []Response
+	for _, daily := range dailys {
+		response := Response{
+			ID:      daily.ID,
+			Name:    daily.Name,
+			Points:  daily.Points,
+			NumDays: daily.NumDays,
+		}
+		data = append(data, response)
+	}
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"daily": data}})
+}
+
+// Get my daily (check enddate)
+func (cc *ChallengeController) GetMyDailyChallenge(ctx *gin.Context) {
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	var patient models.Patient
+	result := cc.DB.Preload("Challenge").First(&patient, "id = ?", currentUser.ID)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
+		return
+	}
+
+	// dont have challenge
+	if patient.ChallengeID == nil {
+		ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Don't have my daily challenge", "data": gin.H{"daily": nil}})
+
+		// have challenge
+	} else {
+		var recordDailyLatest models.RecordDaily
+		cc.DB.First(&recordDailyLatest, "patient_id = ?", currentUser.ID)
+		date := time.Now().UTC().Truncate(24 * time.Hour)
+		endDate, _ := time.Parse("2006-01-02", recordDailyLatest.EndDate)
+
+		// in process
+		if endDate.After(date) || endDate.Equal(date) {
+			ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"daily": patient.Challenge}})
+			return
+
+			// finish challenge
+		} else {
+
+			// get points
+			var recordDailys []models.RecordDaily
+			var count int64
+			points := 0
+			cc.DB.Where("patient_id = ?", currentUser.ID).Find(&recordDailys).Count(&count)
+			if count == int64(patient.Challenge.NumDays) {
+				// change data List from json.RawMessage to []models.List
+				type List struct {
+					Name  string `json:"name"`
+					Check bool   `gorm:"default:false" json:"check"`
+				}
+				var listData []List
+				allChecked := true
+				for _, recordDaily := range recordDailys {
+					if err := json.Unmarshal(recordDaily.List, &listData); err != nil {
+						ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not Unmarshal"})
+						return
+					}
+					for _, listItem := range listData {
+						if listItem.Check != true {
+							allChecked = false
+							break
+						}
+					}
+				}
+				if allChecked {
+					updatePoint := &models.Patient{
+						CollectPoints: patient.CollectPoints + patient.Challenge.Points,
+					}
+					result = cc.DB.Model(&patient).Updates(updatePoint)
+					if result.Error != nil {
+						ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update points"})
+						return
+					}
+					points = patient.Challenge.Points
+				}
+			}
+
+			// -1 Participant in daily challenge
+			var daily models.DailyChallenge
+			cc.DB.First(&daily, "id = ?", patient.ChallengeID)
+			updateDaily := &models.DailyChallenge{
+				Participants: daily.Participants - 1,
+			}
+			cc.DB.Model(&daily).Updates(updateDaily)
+
+			// delete recordDaily
+			result := cc.DB.Delete(&models.RecordDaily{}, "patient_id = ?", currentUser.ID)
+			if result.Error != nil {
+				ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No user with that title exists"})
+				return
+			}
+			// delete challengeID
+			if err := cc.DB.Model(&models.Patient{}).Where("id = ?", currentUser.ID).Update("challenge_id", nil).Error; err != nil {
+				ctx.JSON(http.StatusInternalServerError, gin.H{"status": "fail", "message": "Unable to update challenge_id"})
+				return
+			}
+
+			ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Finish Challenge", "points": points, "data": gin.H{"daily": nil}})
+			return
+		}
+	}
 }
