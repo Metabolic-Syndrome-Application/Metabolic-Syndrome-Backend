@@ -559,7 +559,8 @@ func (rc *RecordController) GetOtherRecordHealthByPatientType(ctx *gin.Context) 
 func (rc *RecordController) GetRecordPlan(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	var recordPlan models.RecordPlan
-	date := time.Now().UTC().Truncate(24 * time.Hour)
+	date := time.Now().Add(7 * time.Hour).Truncate(24 * time.Hour)
+	date = time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, time.Now().Location())
 
 	result := rc.DB.First(&recordPlan, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, date, date.Add(24*time.Hour))
 	if result.Error != nil {
@@ -625,7 +626,8 @@ func (rc *RecordController) GetRecordPlan(ctx *gin.Context) {
 func (rc *RecordController) GetRecordPlanList(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	var recordPlan models.RecordPlan
-	date := time.Now().UTC().Truncate(24 * time.Hour)
+	date := time.Now().Add(7 * time.Hour).Truncate(24 * time.Hour)
+	date = time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, time.Now().Location())
 
 	result := rc.DB.First(&recordPlan, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, date, date.Add(24*time.Hour))
 	if result.Error != nil {
@@ -691,7 +693,8 @@ func (rc *RecordController) GetRecordPlanList(ctx *gin.Context) {
 func (rc *RecordController) GetRecordPlanMood(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	var recordPlan models.RecordPlan
-	date := time.Now().UTC().Truncate(24 * time.Hour)
+	date := time.Now().Add(7 * time.Hour).Truncate(24 * time.Hour)
+	date = time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, time.Now().Location())
 
 	result := rc.DB.First(&recordPlan, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, date, date.Add(24*time.Hour))
 	if result.Error != nil {
@@ -783,7 +786,8 @@ func (rc *RecordController) GetRecordPlanMoodAll(ctx *gin.Context) {
 func (rc *RecordController) UpdateRecordPlanList(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	var recordPlan models.RecordPlan
-	date := time.Now().UTC().Truncate(24 * time.Hour)
+	date := time.Now().Add(7 * time.Hour).Truncate(24 * time.Hour)
+	date = time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, time.Now().Location())
 	result := rc.DB.First(&recordPlan, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, date, date.Add(24*time.Hour))
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
@@ -861,7 +865,8 @@ func (rc *RecordController) UpdateRecordPlanList(ctx *gin.Context) {
 func (rc *RecordController) UpdateRecordPlanMood(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	var recordPlan models.RecordPlan
-	date := time.Now().UTC().Truncate(24 * time.Hour)
+	date := time.Now().Add(7 * time.Hour).Truncate(24 * time.Hour)
+	date = time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, time.Now().Location())
 	result := rc.DB.First(&recordPlan, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, date, date.Add(24*time.Hour))
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
@@ -894,7 +899,7 @@ func (rc *RecordController) GetRecordPlanListByDate(ctx *gin.Context) {
 	dateStr := ctx.Param("date")
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	var recordPlan models.RecordPlan
-	date, _ := time.Parse("2006-01-02", dateStr)
+	date, _ := time.ParseInLocation("2006-01-02", dateStr, time.Now().Location())
 	result := rc.DB.First(&recordPlan, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, date, date.Add(24*time.Hour))
 	if result.Error != nil {
 		// not fond this row
@@ -960,7 +965,7 @@ func (rc *RecordController) UpdateRecordPlanListByDate(ctx *gin.Context) {
 	dateStr := ctx.Param("date")
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	var recordPlan models.RecordPlan
-	date, _ := time.Parse("2006-01-02", dateStr)
+	date, _ := time.ParseInLocation("2006-01-02", dateStr, time.Now().Location())
 	result := rc.DB.First(&recordPlan, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, date, date.Add(24*time.Hour))
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
@@ -1024,7 +1029,8 @@ func (rc *RecordController) GetOtherRecordPlan(ctx *gin.Context) {
 func (rc *RecordController) GetRecordDailyList(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	var recordDaily models.RecordDaily
-	date := time.Now().UTC().Truncate(24 * time.Hour)
+	date := time.Now().Add(7 * time.Hour).Truncate(24 * time.Hour)
+	date = time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, time.Now().Location())
 	result := rc.DB.First(&recordDaily, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, date, date.Add(24*time.Hour))
 	if result.Error != nil {
 		// not fond this row
@@ -1056,7 +1062,7 @@ func (rc *RecordController) GetRecordDailyList(ctx *gin.Context) {
 					break
 				}
 			}
-			startDate, _ := time.Parse("2006-01-02", recordDailyLatest.StartDate)
+			startDate, _ := time.ParseInLocation("2006-01-02", recordDailyLatest.StartDate, time.Now().Location())
 			day := int(date.Sub(startDate).Hours()/24) + 1
 			listJSON, _ := json.Marshal(list)
 			newRecordDaily := &models.RecordDaily{
@@ -1089,7 +1095,8 @@ func (rc *RecordController) GetRecordDailyList(ctx *gin.Context) {
 func (rc *RecordController) UpdateRecordDailyList(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	var recordDaily models.RecordDaily
-	date := time.Now().UTC().Truncate(24 * time.Hour)
+	date := time.Now().Add(7 * time.Hour).Truncate(24 * time.Hour)
+	date = time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, time.Now().Location())
 	result := rc.DB.First(&recordDaily, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, date, date.Add(24*time.Hour))
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})

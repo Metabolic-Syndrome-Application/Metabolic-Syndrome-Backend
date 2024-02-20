@@ -143,7 +143,8 @@ func (cc *ChallengeController) GetAllQuizChallenge(ctx *gin.Context) {
 func (cc *ChallengeController) CheckQuizToday(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	var recordQuiz models.RecordQuiz
-	date := time.Now().UTC().Truncate(24 * time.Hour)
+	date := time.Now().Add(7 * time.Hour).Truncate(24 * time.Hour)
+	date = time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, time.Now().Location())
 	result := cc.DB.First(&recordQuiz, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, date, date.Add(24*time.Hour))
 	if result.Error != nil {
 		// not fond this row
@@ -397,8 +398,9 @@ func (cc *ChallengeController) GetMyDailyChallenge(ctx *gin.Context) {
 	} else {
 		var recordDailyLatest models.RecordDaily
 		cc.DB.First(&recordDailyLatest, "patient_id = ?", currentUser.ID)
-		date := time.Now().UTC().Truncate(24 * time.Hour)
-		endDate, _ := time.Parse("2006-01-02", recordDailyLatest.EndDate)
+		date := time.Now().Add(7 * time.Hour).Truncate(24 * time.Hour)
+		date = time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, time.Now().Location())
+		endDate, _ := time.ParseInLocation("2006-01-02", recordDailyLatest.EndDate, time.Now().Location())
 
 		// in process
 		if endDate.After(date) || endDate.Equal(date) {
