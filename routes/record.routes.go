@@ -38,6 +38,8 @@ func (rc *RecordRouteController) RecordRoute(rg *gin.RouterGroup) {
 	// Get other record health record_by patient type (Web)
 	router.GET("/health/patient/:id/:type", middleware.DeserializeUser(), rc.recordController.GetOtherRecordHealthByPatientType)
 
+	/////////////////////////////////////////////////////////////////////////////////////////////
+
 	// plan
 
 	// today
@@ -63,5 +65,13 @@ func (rc *RecordRouteController) RecordRoute(rg *gin.RouterGroup) {
 
 	// get record plan (web)
 	router.GET("/plan/:id", middleware.DeserializeUser(), rc.recordController.GetOtherRecordPlan)
+
+	/////////////////////////////////////////////////////////////////////////////////////////////
+
+	// daily
+
+	// mobile
+	router.GET("/daily/list", middleware.DeserializeUser(), rc.recordController.GetRecordDailyList)
+	router.PUT("/daily/list", middleware.DeserializeUser(), rc.recordController.UpdateRecordDailyList)
 
 }

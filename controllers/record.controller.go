@@ -1016,3 +1016,105 @@ func (rc *RecordController) GetOtherRecordPlan(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": data})
 
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
+// daily
+
+func (rc *RecordController) GetRecordDailyList(ctx *gin.Context) {
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	var recordDaily models.RecordDaily
+	date := time.Now().UTC().Truncate(24 * time.Hour)
+	result := rc.DB.First(&recordDaily, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, date, date.Add(24*time.Hour))
+	if result.Error != nil {
+		// not fond this row
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			var recordDailyLatest models.RecordDaily
+			rc.DB.First(&recordDailyLatest, "patient_id = ?", currentUser.ID)
+			var patient models.Patient
+			result1 := rc.DB.Preload("Challenge").First(&patient, "id = ?", currentUser.ID)
+			if result1.Error != nil {
+				ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No post with that title exists"})
+				return
+			}
+			date := time.Now()
+			today := strings.ToLower(date.Weekday().String())
+			type List struct {
+				Name  string `json:"name"`
+				Check bool   `gorm:"default:false" json:"check"`
+			}
+			var list []List
+			for _, value := range patient.Challenge.Detail.Day {
+				if value == today {
+					for _, name := range patient.Challenge.Detail.Name {
+						response := List{
+							Name:  name,
+							Check: false,
+						}
+						list = append(list, response)
+					}
+					break
+				}
+			}
+			startDate, _ := time.Parse("2006-01-02", recordDailyLatest.StartDate)
+			day := int(date.Sub(startDate).Hours()/24) + 1
+			listJSON, _ := json.Marshal(list)
+			newRecordDaily := &models.RecordDaily{
+				PatientID:        currentUser.ID,
+				DailyChallengeID: patient.Challenge.ID,
+				Day:              day,
+				List:             json.RawMessage(listJSON),
+				StartDate:        recordDailyLatest.StartDate,
+				EndDate:          recordDailyLatest.EndDate,
+			}
+
+			result2 := rc.DB.Create(&newRecordDaily)
+			if result2.Error != nil {
+				ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not create Record dairy"})
+				return
+			}
+			ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "create record plan", "data": gin.H{"day": newRecordDaily.Day, "list": newRecordDaily.List}})
+
+			// error
+		} else {
+			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "error"})
+		}
+		// already have record plan on this day
+	} else {
+		ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"day": recordDaily.Day, "list": recordDaily.List}})
+	}
+
+}
+
+func (rc *RecordController) UpdateRecordDailyList(ctx *gin.Context) {
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	var recordDaily models.RecordDaily
+	date := time.Now().UTC().Truncate(24 * time.Hour)
+	result := rc.DB.First(&recordDaily, "patient_id = ? AND created_at >= ? AND created_at < ?", currentUser.ID, date, date.Add(24*time.Hour))
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
+		return
+	}
+
+	var payload = struct {
+		List json.RawMessage `gorm:"type:json" json:"list"`
+	}{}
+
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+
+	updateDailyList := &models.RecordDaily{
+		List: payload.List,
+	}
+
+	result = rc.DB.Model(&recordDaily).Updates(updateDailyList)
+	if result.Error != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update daily list"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Update daily list success"})
+
+}

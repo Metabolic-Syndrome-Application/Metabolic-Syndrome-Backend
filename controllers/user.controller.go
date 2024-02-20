@@ -1,8 +1,10 @@
 package controllers
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
+	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -46,8 +48,7 @@ func (uc *UserController) UpdateProfile(ctx *gin.Context) {
 			return
 		}
 
-		if *updateProfilePatient.ChallengeID != *payload.ChallengeID {
-			fmt.Println(updateProfilePatient.ChallengeID, payload.ChallengeID)
+		if updateProfilePatient.ChallengeID == nil && payload.ChallengeID != nil {
 			var dailyChallenge models.DailyChallenge
 			result := uc.DB.First(&dailyChallenge, "id = ?", payload.ChallengeID)
 			if result.Error == nil {
@@ -56,6 +57,42 @@ func (uc *UserController) UpdateProfile(ctx *gin.Context) {
 				}
 				uc.DB.Model(&dailyChallenge).Updates(updateDaily)
 			}
+			date := time.Now()
+			today := strings.ToLower(date.Weekday().String())
+			type List struct {
+				Name  string `json:"name"`
+				Check bool   `gorm:"default:false" json:"check"`
+			}
+			var list []List
+			for _, value := range dailyChallenge.Detail.Day {
+				if value == today {
+					for _, name := range dailyChallenge.Detail.Name {
+						response := List{
+							Name:  name,
+							Check: false,
+						}
+						list = append(list, response)
+					}
+					break
+				}
+			}
+			listJSON, _ := json.Marshal(list)
+			newRecordDaily := &models.RecordDaily{
+				PatientID:        currentUser.ID,
+				DailyChallengeID: dailyChallenge.ID,
+				Day:              1,
+				List:             json.RawMessage(listJSON),
+				StartDate:        date.Format("2006-01-02"),
+				EndDate:          date.AddDate(0, 0, dailyChallenge.NumDays-1).Format("2006-01-02"),
+			}
+
+			result2 := uc.DB.Create(&newRecordDaily)
+			if result2.Error != nil {
+				ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not create Record dairy"})
+				return
+			}
+			ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Start Challenge!"})
+
 		}
 
 		updatePatient := &models.Patient{

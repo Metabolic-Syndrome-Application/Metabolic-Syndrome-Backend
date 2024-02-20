@@ -67,3 +67,19 @@ type RecordQuiz struct {
 func (RecordQuiz) TableName() string {
 	return "recordQuiz"
 }
+
+type RecordDaily struct {
+	ID               uuid.UUID       `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
+	PatientID        uuid.UUID       `gorm:"type:uuid ;null" json:"patientID"`
+	DailyChallengeID uuid.UUID       `gorm:"type:uuid ;null" json:"dailyChallengeID"`
+	Day              int             `json:"day"`
+	List             json.RawMessage `gorm:"type:json" json:"list"`
+	StartDate        string          `json:"startDate"`
+	EndDate          string          `json:"endDate"`
+	UpdatedAt        time.Time       `json:"updatedAt"`
+	CreatedAt        time.Time       `json:"createdAt"`
+}
+
+func (RecordDaily) TableName() string {
+	return "recordDaily"
+}
