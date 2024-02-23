@@ -354,9 +354,9 @@ func (cc *ChallengeController) GetAllDailyChallenge(ctx *gin.Context) {
 func (cc *ChallengeController) GetAllActiveDailyChallenge(ctx *gin.Context) {
 	currentUser := ctx.MustGet("currentUser").(models.User)
 	var patient models.Patient
-	cc.DB.First(&patient, "id = ?", currentUser.ID)
+	cc.DB.Preload("Challenge").First(&patient, "id = ?", currentUser.ID)
 	var dailys []models.DailyChallenge
-	result := cc.DB.Where("status = 'active' AND id != ?", patient.ChallengeID).Find(&dailys)
+	result := cc.DB.Where("status = 'active' AND id != ?", patient.Challenge.ID).Find(&dailys)
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "not have daily data"})
 		return

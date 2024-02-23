@@ -10,13 +10,13 @@ import (
 
 type Plan struct {
 	ID          uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	Photo       string    `json:"photo"`
-	Type        string    `json:"type"`
+	Name        string    `gorm:"not null" json:"name"`
+	Description string    `gorm:"not null" json:"description"`
+	Photo       string    `gorm:"not null" json:"photo"`
+	Type        string    `gorm:"not null" json:"type"`
 	Detail      Detail    `gorm:"type:json" json:"detail"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
+	CreatedAt   time.Time `gorm:"not null" json:"createdAt"`
+	UpdatedAt   time.Time `gorm:"not null" json:"updatedAt"`
 }
 
 type Detail struct {

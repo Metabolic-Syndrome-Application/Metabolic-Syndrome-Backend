@@ -3,14 +3,22 @@ module github.com/ployns/Metabolic-Syndrome-Backend
 go 1.21.1
 
 require (
+	ariga.io/atlas-provider-gorm v0.1.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/google/uuid v1.1.2
+	github.com/lib/pq v1.10.9
 	github.com/spf13/viper v1.16.0
 	gorm.io/driver/postgres v1.5.2
 	gorm.io/gorm v1.25.4
 )
 
-require github.com/lib/pq v1.10.9 // indirect
+require (
+	ariga.io/atlas-go-sdk v0.0.0-20230709063453-1058d6508503 // indirect
+	github.com/go-sql-driver/mysql v1.7.0 // indirect
+	github.com/mattn/go-sqlite3 v1.14.17 // indirect
+	gorm.io/driver/mysql v1.5.1 // indirect
+	gorm.io/driver/sqlite v1.5.2 // indirect
+)
 
 require (
 	github.com/bytedance/sonic v1.10.1 // indirect
