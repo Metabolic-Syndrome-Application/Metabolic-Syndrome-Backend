@@ -11,7 +11,7 @@ import (
 )
 
 type User struct {
-	ID        uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();not null;primary_key"`
+	ID        uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`
 	Username  string    `gorm:"type:varchar(255);not null" json:"username"`
 	Password  string    `gorm:"not null"`
 	Role      string    `gorm:"type:varchar(255);not null" json:"role"`
@@ -26,7 +26,7 @@ func (User) TableName() string {
 }
 
 type Doctor struct {
-	ID         uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();not null;primary_key" json:"id"`
+	ID         uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
 	Username   string    `gorm:"type:varchar(255);not null" json:"username"`
 	Prefix     string    `json:"prefix"`
 	FirstName  string    `json:"firstName"`
@@ -42,7 +42,7 @@ func (Doctor) TableName() string {
 }
 
 type Staff struct {
-	ID         uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();not null;primary_key" json:"id"`
+	ID         uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
 	Username   string    `gorm:"type:varchar(255);not null" json:"username"`
 	Prefix     string    `json:"prefix"`
 	FirstName  string    `json:"firstName"`
@@ -58,7 +58,7 @@ func (Staff) TableName() string {
 }
 
 type Patient struct {
-	ID                 uuid.UUID      `gorm:"type:uuid;default:uuid_generate_v4();not null;primary_key" json:"id"`
+	ID                 uuid.UUID      `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
 	HN                 *string        `json:"hn"`
 	Alias              string         `json:"alias"`
 	FirstName          string         `json:"firstName"`
@@ -72,13 +72,13 @@ type Patient struct {
 	AssistanceDoctorID *uuid.UUID     `gorm:"type:uuid" json:"assistanceDoctorID"`
 	AssistanceDoctor   Doctor         `gorm:"foreignKey:AssistanceDoctorID;" json:"assistanceDoctor"`
 	DiseaseRisk        DiseaseRisk    `gorm:"type:jsonb" json:"diseaseRisk"`
-	PlanID             pq.StringArray `gorm:"type:uuid[];column:plan_id;null" json:"planID"`
+	PlanID             pq.StringArray `gorm:"type:uuid[];column:plan_id" json:"planID"`
 	Plan               []Plan         `gorm:"many2many:patient_plan;association_foreignkey:ID;joinForeignKey:PatientID;References:ID;joinReferences:PlanID" json:"Plan"`
-	ChallengeID        *uuid.UUID     `gorm:"type:uuid ;null" json:"challengeID"`
+	ChallengeID        *uuid.UUID     `gorm:"type:uuid" json:"challengeID"`
 	Challenge          DailyChallenge `gorm:"foreignKey:ChallengeID" json:"challenge"`
-	CollectPoints      int            `gorm:"not null" json:"collectPoints"`
-	Status             string         `gorm:"default:'in process';not null " json:"status"`
-	UpdatedAt          time.Time      `gorm:"not null" json:"updatedAt"`
+	CollectPoints      int            `json:"collectPoints"`
+	Status             string         `gorm:"default:'in process'" json:"status"`
+	UpdatedAt          time.Time      `json:"updatedAt"`
 }
 type DiseaseRisk struct {
 	Diabetes       string `json:"diabetes"`

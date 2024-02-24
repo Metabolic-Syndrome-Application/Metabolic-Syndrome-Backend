@@ -9,21 +9,21 @@ import (
 )
 
 type RecordHealth struct {
-	ID                     uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();not null;primary_key" json:"id"`
-	PatientID              uuid.UUID `gorm:"type:uuid ;not null" json:"patientID"`
-	Height                 float32   `gorm:"not null" json:"height"`
-	Weight                 float32   `gorm:"not null" json:"weight"`
-	Waistline              float32   `gorm:"not null" json:"waistline"`
-	SystolicBloodPressure  int       `gorm:"not null" json:"systolicBloodPressure"`
-	DiastolicBloodPressure int       `gorm:"not null" json:"diastolicBloodPressure"`
-	PulseRate              int       `gorm:"not null" json:"pulseRate"`
-	BloodGlucose           float32   `gorm:"not null" json:"bloodGlucose"`
-	Cholesterol            float32   `gorm:"not null" json:"cholesterol"`
-	HDL                    float32   `gorm:"not null" json:"hdl"`
-	LDL                    float32   `gorm:"not null" json:"ldl"`
-	Triglyceride           float32   `gorm:"not null" json:"triglyceride"`
-	RecordBy               string    `gorm:"not null" json:"recordBy"`
-	Timestamp              time.Time `gorm:"not null"`
+	ID                     uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
+	PatientID              uuid.UUID `gorm:"type:uuid" json:"patientID"`
+	Height                 float32   `json:"height"`
+	Weight                 float32   `json:"weight"`
+	Waistline              float32   `json:"waistline"`
+	SystolicBloodPressure  int       `json:"systolicBloodPressure"`
+	DiastolicBloodPressure int       `json:"diastolicBloodPressure"`
+	PulseRate              int       `json:"pulseRate"`
+	BloodGlucose           float32   `json:"bloodGlucose"`
+	Cholesterol            float32   `json:"cholesterol"`
+	HDL                    float32   `json:"hdl"`
+	LDL                    float32   `json:"ldl"`
+	Triglyceride           float32   `json:"triglyceride"`
+	RecordBy               string    `json:"recordBy"`
+	Timestamp              time.Time
 }
 
 func (RecordHealth) TableName() string {
@@ -31,19 +31,19 @@ func (RecordHealth) TableName() string {
 }
 
 type RecordPlan struct {
-	ID        uuid.UUID       `gorm:"type:uuid;default:uuid_generate_v4();not null;primary_key" json:"id"`
-	PatientID uuid.UUID       `gorm:"type:uuid ;not null" json:"patientID"`
+	ID        uuid.UUID       `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
+	PatientID uuid.UUID       `gorm:"type:uuid" json:"patientID"`
 	List      json.RawMessage `gorm:"type:json" json:"list"`
 	Mood      *string         `json:"mood"`
-	GetPoint  bool            `gorm:"default:false;not null" json:"getPoint"`
-	CreatedAt time.Time       `gorm:"not null" json:"createdAt"`
-	UpdatedAt time.Time       `gorm:"not null" json:"updatedAt"`
+	GetPoint  bool            `gorm:"default:false" json:"getPoint"`
+	CreatedAt time.Time       `json:"createdAt"`
+	UpdatedAt time.Time       `json:"updatedAt"`
 }
 
 type List struct {
-	Name  string `gorm:"not null" json:"name"`
-	Check bool   `gorm:"default:false;not null" json:"check"`
-	Type  string `gorm:"not null" json:"type"`
+	Name  string `json:"name"`
+	Check bool   `gorm:"default:false" json:"check"`
+	Type  string `json:"type"`
 }
 
 func (dr *List) Scan(value interface{}) error {
@@ -58,10 +58,10 @@ func (RecordPlan) TableName() string {
 }
 
 type RecordQuiz struct {
-	ID              uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();not null;primary_key" json:"id"`
-	PatientID       uuid.UUID `gorm:"type:uuid ;not null" json:"patientID"`
-	QuizChallengeID uuid.UUID `gorm:"type:uuid ;not null" json:"quizChallengeID"`
-	CreatedAt       time.Time `gorm:"not null" json:"createdAt"`
+	ID              uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
+	PatientID       uuid.UUID `gorm:"type:uuid" json:"patientID"`
+	QuizChallengeID uuid.UUID `gorm:"type:uuid" json:"quizChallengeID"`
+	CreatedAt       time.Time `json:"createdAt"`
 }
 
 func (RecordQuiz) TableName() string {
@@ -69,15 +69,15 @@ func (RecordQuiz) TableName() string {
 }
 
 type RecordDaily struct {
-	ID               uuid.UUID       `gorm:"type:uuid;not null;primary_key" json:"id"`
-	PatientID        uuid.UUID       `gorm:"type:uuid ;not null" json:"patientID"`
-	DailyChallengeID uuid.UUID       `gorm:"type:uuid ;not null" json:"dailyChallengeID"`
-	Day              int             `gorm:"not null" json:"day"`
-	List             json.RawMessage `gorm:"type:json;not null" json:"list"`
-	StartDate        string          `gorm:"not null" json:"startDate"`
-	EndDate          string          `gorm:"not null" json:"endDate"`
-	UpdatedAt        time.Time       `gorm:"not null" json:"updatedAt"`
-	CreatedAt        time.Time       `gorm:"not null" json:"createdAt"`
+	ID               uuid.UUID       `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
+	PatientID        uuid.UUID       `gorm:"type:uuid" json:"patientID"`
+	DailyChallengeID uuid.UUID       `gorm:"type:uuid" json:"dailyChallengeID"`
+	Day              int             `json:"day"`
+	List             json.RawMessage `gorm:"type:json" json:"list"`
+	StartDate        string          `json:"startDate"`
+	EndDate          string          `json:"endDate"`
+	UpdatedAt        time.Time       `json:"updatedAt"`
+	CreatedAt        time.Time       `json:"createdAt"`
 }
 
 func (RecordDaily) TableName() string {

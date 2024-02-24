@@ -48,7 +48,27 @@ func (uc *UserController) UpdateProfile(ctx *gin.Context) {
 			return
 		}
 
-		if updateProfilePatient.ChallengeID == nil && payload.ChallengeID != nil {
+		updatePatient := &models.Patient{
+			Alias:       payload.Alias,
+			FirstName:   payload.FirstName,
+			LastName:    payload.LastName,
+			YearOfBirth: payload.YearOfBirth,
+			Gender:      payload.Gender,
+			Photo:       payload.Photo,
+			ChallengeID: payload.ChallengeID,
+		}
+
+		checkNull := false
+		if updateProfilePatient.ChallengeID == nil {
+			checkNull = true
+		}
+
+		a := uc.DB.Model(&updateProfilePatient).Updates(updatePatient)
+		if a.Error != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update profile patient"})
+			return
+		}
+		if checkNull && payload.ChallengeID != nil {
 			var dailyChallenge models.DailyChallenge
 			result := uc.DB.First(&dailyChallenge, "id = ?", payload.ChallengeID)
 			if result.Error == nil {
@@ -91,23 +111,7 @@ func (uc *UserController) UpdateProfile(ctx *gin.Context) {
 				ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not create Record dairy"})
 				return
 			}
-			ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Start Challenge!"})
-
-		}
-
-		updatePatient := &models.Patient{
-			Alias:       payload.Alias,
-			FirstName:   payload.FirstName,
-			LastName:    payload.LastName,
-			YearOfBirth: payload.YearOfBirth,
-			Gender:      payload.Gender,
-			Photo:       payload.Photo,
-			ChallengeID: payload.ChallengeID,
-		}
-
-		a := uc.DB.Model(&updateProfilePatient).Updates(updatePatient)
-		if a.Error != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update profile patient"})
+			ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Update profile patient success, Start challenge!"})
 			return
 		}
 		ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Update profile patient success"})
