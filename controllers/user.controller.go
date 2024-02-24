@@ -594,23 +594,27 @@ func (uc *UserController) GetOtherProfile(ctx *gin.Context) {
 func (uc *UserController) DeleteUser(ctx *gin.Context) {
 	userRole := ctx.Param("role")
 	userID := ctx.Param("id")
-	result := uc.DB.Delete(&models.User{}, "id = ?", userID)
-	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No user with that title exists"})
-		return
-	}
 	if userRole == "patient" {
-		// Delete the references to the patient from the patient_plan table
-		if err := uc.DB.Exec("DELETE FROM patient_plan WHERE patient_id = ?", userID).Error; err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "fail", "message": "Failed to delete references to the plan"})
+		// // Delete the references to the patient from the patient_plan table
+		// if err := uc.DB.Exec("DELETE FROM patient_plan WHERE patient_id = ?", userID).Error; err != nil {
+		// 	ctx.JSON(http.StatusInternalServerError, gin.H{"status": "fail", "message": "Failed to delete references to the plan"})
+		// 	return
+		// }
+		// result := uc.DB.Delete(&models.Patient{}, "id = ?", userID)
+		// if result.Error != nil {
+		// 	ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No user with that title exists"})
+		// 	return
+		// }
+		if err := uc.DB.Model(&models.Patient{}).Where("id = ?", userID).Update("hn", nil).Error; err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "fail", "message": "Unable to update hn"})
 			return
 		}
-		result := uc.DB.Delete(&models.Patient{}, "id = ?", userID)
+	} else if userRole == "doctor" {
+		result := uc.DB.Delete(&models.User{}, "id = ?", userID)
 		if result.Error != nil {
 			ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No user with that title exists"})
 			return
 		}
-	} else if userRole == "doctor" {
 		if err := uc.DB.Model(&models.Patient{}).Where("main_doctor_id = ?", userID).Update("main_doctor_id", nil).Error; err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "fail", "message": "error"})
 			return
@@ -620,15 +624,20 @@ func (uc *UserController) DeleteUser(ctx *gin.Context) {
 			return
 		}
 
-		result := uc.DB.Delete(&models.Doctor{}, "id = ?", userID)
-		if result.Error != nil {
+		result1 := uc.DB.Delete(&models.Doctor{}, "id = ?", userID)
+		if result1.Error != nil {
 			ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No user with that title exists"})
 			return
 		}
 
 	} else if userRole == "staff" {
-		result := uc.DB.Delete(&models.Staff{}, "id = ?", userID)
+		result := uc.DB.Delete(&models.User{}, "id = ?", userID)
 		if result.Error != nil {
+			ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No user with that title exists"})
+			return
+		}
+		result1 := uc.DB.Delete(&models.Staff{}, "id = ?", userID)
+		if result1.Error != nil {
 			ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No user with that title exists"})
 			return
 		}

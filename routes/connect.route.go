@@ -17,6 +17,8 @@ func NewConnectRouteController(connectController controllers.ConnectController) 
 func (cc *ConnectRouteController) ConnectRoute(rg *gin.RouterGroup) {
 	router := rg.Group("/connect")
 
-	router.POST("/generate-otp", middleware.DeserializeUser(), cc.connectController.Connect)
+	// Web
+	router.POST("/generate-otp", middleware.DeserializeUser(), cc.connectController.GenerateOTP)
+	router.GET("/refresh-otp/:id", middleware.DeserializeUser(), cc.connectController.RefreshOTP)
 
 }

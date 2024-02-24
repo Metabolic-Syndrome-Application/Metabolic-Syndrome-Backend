@@ -20,7 +20,7 @@ func NewConnectController(DB *gorm.DB) ConnectController {
 	return ConnectController{DB}
 }
 
-func (cc *ConnectController) Connect(ctx *gin.Context) {
+func (cc *ConnectController) GenerateOTP(ctx *gin.Context) {
 	var payload = struct {
 		HN                 string     `json:"hn"`
 		FirstName          string     `json:"firstName"`
@@ -64,4 +64,27 @@ func (cc *ConnectController) Connect(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, gin.H{"status": "success", "message": "Create connect success", "data": gin.H{"id": newConnect.ID, "otp": otp}})
+}
+
+func (cc *ConnectController) RefreshOTP(ctx *gin.Context) {
+	connectID := ctx.Param("id")
+	var connect models.Connect
+	result := cc.DB.First(&connect, "id = ?", connectID)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
+		return
+	}
+	otp := utils.GenerateOTP(4)
+	expiredIn := time.Now().Add(3 * time.Minute)
+
+	updateConnect := models.Connect{
+		OTP:       otp,
+		ExpiresIn: expiredIn,
+	}
+	if err := cc.DB.Model(&connect).Updates(updateConnect).Error; err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not refresh otp"})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Refresh OTP", "data": gin.H{"id": connect.ID, "otp": otp}})
+
 }
