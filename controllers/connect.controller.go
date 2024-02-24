@@ -6,7 +6,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/lib/pq"
 	"github.com/ployns/Metabolic-Syndrome-Backend/models"
 	"github.com/ployns/Metabolic-Syndrome-Backend/utils"
 	"gorm.io/gorm"
@@ -35,7 +34,6 @@ func (cc *ConnectController) GenerateOTP(ctx *gin.Context) {
 			Hypertension   string `json:"hypertension"`
 			Obesity        string `json:"obesity"`
 		} `json:"diseaseRisk"`
-		PlanID pq.StringArray `gorm:"type:uuid[];column:plan_id" json:"planID"`
 	}{}
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
@@ -56,7 +54,6 @@ func (cc *ConnectController) GenerateOTP(ctx *gin.Context) {
 		MainDoctorID:       payload.MainDoctorID,
 		AssistanceDoctorID: payload.AssistanceDoctorID,
 		DiseaseRisk:        payload.DiseaseRisk,
-		PlanID:             payload.PlanID,
 	}
 	if err := cc.DB.Create(&newConnect).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not create connect"})
