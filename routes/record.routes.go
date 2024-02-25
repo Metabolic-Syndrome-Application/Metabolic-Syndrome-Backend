@@ -23,10 +23,11 @@ func (rc *RecordRouteController) RecordRoute(rg *gin.RouterGroup) {
 	// Create record health (Mobile)
 	router.POST("/health", middleware.DeserializeUser(), rc.recordController.RecordHealth)
 	// Create record health by hospital (Web)
-
 	router.POST("/health/:id", middleware.DeserializeUser(), rc.recordController.OtherRecordHealth)
 	// Get other record health (Web)  รวมทั้ง record_by patient / hospital
 	router.GET("/health/:id", middleware.DeserializeUser(), rc.recordController.GetOtherRecordHealth)
+	// Get record health record_by hospital latest(Web)
+	router.GET("/health/hospital/latest/:id", middleware.DeserializeUser(), rc.recordController.GetRecordHealthByHospitalLatest)
 	// Get record health record_by patient latest(Mobile)
 	router.GET("/health/patient/latest", middleware.DeserializeUser(), rc.recordController.GetRecordHealthByPatientLatest)
 	// Get other record health record_by patient (Web)

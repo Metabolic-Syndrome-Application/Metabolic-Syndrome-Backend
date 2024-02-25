@@ -112,6 +112,18 @@ func (cc *ConnectController) SubmitOTP(ctx *gin.Context) {
 
 		// match
 	} else {
+		// var diseaseRisk struct {
+		// 	Diabetes       string `json:"diabetes"`
+		// 	Hyperlipidemia string `json:"hyperlipidemia"`
+		// 	Hypertension   string `json:"hypertension"`
+		// 	Obesity        string `json:"obesity"`
+		// }
+		// if connect.DiseaseRisk.Diabetes == "" {
+		// 	diseaseRisk = patient.DiseaseRisk
+		// } else {
+		// 	diseaseRisk = connect.DiseaseRisk
+		// }
+
 		updatePatient := &models.Patient{
 			HN:                 connect.HN,
 			FirstName:          connect.FirstName,
