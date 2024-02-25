@@ -151,7 +151,7 @@ func (rc *RecordController) GetOtherRecordHealth(ctx *gin.Context) {
 		LDL                    float32 `json:"ldl"`
 		Triglyceride           float32 `json:"triglyceride"`
 		RecordBy               string  `json:"recordBy"`
-		Timestamp              string
+		Timestamp              string  `json:"timestamp"`
 	}
 	var data []Response
 	for _, record := range records {
@@ -201,7 +201,7 @@ func (rc *RecordController) GetRecordHealthByPatientLatest(ctx *gin.Context) {
 		LDL                    float32 `json:"ldl"`
 		Triglyceride           float32 `json:"triglyceride"`
 		RecordBy               string  `json:"recordBy"`
-		Timestamp              string
+		Timestamp              string  `json:"timestamp"`
 	}
 	var data []Response
 	for _, record := range records {
@@ -251,7 +251,7 @@ func (rc *RecordController) GetOtherRecordHealthByPatient(ctx *gin.Context) {
 		LDL                    float32 `json:"ldl"`
 		Triglyceride           float32 `json:"triglyceride"`
 		RecordBy               string  `json:"recordBy"`
-		Timestamp              string
+		Timestamp              string  `json:"timestamp"`
 	}
 	var data []Response
 	for _, record := range records {
@@ -301,7 +301,7 @@ func (rc *RecordController) GetOtherRecordHealthByHospital(ctx *gin.Context) {
 		LDL                    float32 `json:"ldl"`
 		Triglyceride           float32 `json:"triglyceride"`
 		RecordBy               string  `json:"recordBy"`
-		Timestamp              string
+		Timestamp              string  `json:"timestamp"`
 	}
 	var data []Response
 	for _, record := range records {
@@ -342,7 +342,7 @@ func (rc *RecordController) GetRecordHealthByPatientType(ctx *gin.Context) {
 		type Response struct {
 			BMI       float32 `json:"bmi"`
 			RecordBy  string  `json:"recordBy"`
-			Timestamp string
+			Timestamp string  `json:"timestamp"`
 		}
 		var data []Response
 		for _, record := range records {
@@ -360,7 +360,7 @@ func (rc *RecordController) GetRecordHealthByPatientType(ctx *gin.Context) {
 		type Response struct {
 			Waistline float32 `json:"waistline"`
 			RecordBy  string  `json:"recordBy"`
-			Timestamp string
+			Timestamp string  `json:"timestamp"`
 		}
 		var data []Response
 		for _, record := range records {
@@ -377,7 +377,7 @@ func (rc *RecordController) GetRecordHealthByPatientType(ctx *gin.Context) {
 		type Response struct {
 			BloodGlucose float32 `json:"bloodGlucose"`
 			RecordBy     string  `json:"recordBy"`
-			Timestamp    string
+			Timestamp    string  `json:"timestamp"`
 		}
 		var data []Response
 		for _, record := range records {
@@ -397,7 +397,7 @@ func (rc *RecordController) GetRecordHealthByPatientType(ctx *gin.Context) {
 			LDL          float32 `json:"ldl"`
 			Triglyceride float32 `json:"triglyceride"`
 			RecordBy     string  `json:"recordBy"`
-			Timestamp    string
+			Timestamp    string  `json:"timestamp"`
 		}
 		var data []Response
 		for _, record := range records {
@@ -419,7 +419,7 @@ func (rc *RecordController) GetRecordHealthByPatientType(ctx *gin.Context) {
 			DiastolicBloodPressure int    `json:"diastolicBloodPressure"`
 			PulseRate              int    `json:"pulseRate"`
 			RecordBy               string `json:"recordBy"`
-			Timestamp              string
+			Timestamp              string `json:"timestamp"`
 		}
 		var data []Response
 		for _, record := range records {
@@ -454,7 +454,7 @@ func (rc *RecordController) GetOtherRecordHealthByPatientType(ctx *gin.Context) 
 		type Response struct {
 			BMI       float32 `json:"bmi"`
 			RecordBy  string  `json:"recordBy"`
-			Timestamp string
+			Timestamp string  `json:"timestamp"`
 		}
 		var data []Response
 		for _, record := range records {
@@ -472,7 +472,7 @@ func (rc *RecordController) GetOtherRecordHealthByPatientType(ctx *gin.Context) 
 		type Response struct {
 			Waistline float32 `json:"waistline"`
 			RecordBy  string  `json:"recordBy"`
-			Timestamp string
+			Timestamp string  `json:"timestamp"`
 		}
 		var data []Response
 		for _, record := range records {
@@ -489,7 +489,7 @@ func (rc *RecordController) GetOtherRecordHealthByPatientType(ctx *gin.Context) 
 		type Response struct {
 			BloodGlucose float32 `json:"bloodGlucose"`
 			RecordBy     string  `json:"recordBy"`
-			Timestamp    string
+			Timestamp    string  `json:"timestamp"`
 		}
 		var data []Response
 		for _, record := range records {
@@ -509,7 +509,7 @@ func (rc *RecordController) GetOtherRecordHealthByPatientType(ctx *gin.Context) 
 			LDL          float32 `json:"ldl"`
 			Triglyceride float32 `json:"triglyceride"`
 			RecordBy     string  `json:"recordBy"`
-			Timestamp    string
+			Timestamp    string  `json:"timestamp"`
 		}
 		var data []Response
 		for _, record := range records {
@@ -531,7 +531,7 @@ func (rc *RecordController) GetOtherRecordHealthByPatientType(ctx *gin.Context) 
 			DiastolicBloodPressure int    `json:"diastolicBloodPressure"`
 			PulseRate              int    `json:"pulseRate"`
 			RecordBy               string `json:"recordBy"`
-			Timestamp              string
+			Timestamp              string `json:"timestamp"`
 		}
 		var data []Response
 		for _, record := range records {

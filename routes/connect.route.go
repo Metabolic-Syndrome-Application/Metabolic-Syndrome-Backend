@@ -21,4 +21,6 @@ func (cc *ConnectRouteController) ConnectRoute(rg *gin.RouterGroup) {
 	router.POST("/generate-otp", middleware.DeserializeUser(), cc.connectController.GenerateOTP)
 	router.GET("/refresh-otp/:id", middleware.DeserializeUser(), cc.connectController.RefreshOTP)
 
+	router.POST("/submit-otp", middleware.DeserializeUser(), cc.connectController.SubmitOTP)
+
 }

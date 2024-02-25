@@ -21,7 +21,7 @@ func NewConnectController(DB *gorm.DB) ConnectController {
 
 func (cc *ConnectController) GenerateOTP(ctx *gin.Context) {
 	var payload = struct {
-		HN                 string     `json:"hn"`
+		HN                 *string    `json:"hn"`
 		FirstName          string     `json:"firstName"`
 		LastName           string     `json:"lastName"`
 		YearOfBirth        int        `json:"yearOfBirth"`
@@ -83,5 +83,55 @@ func (cc *ConnectController) RefreshOTP(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Refresh OTP", "data": gin.H{"id": connect.ID, "otp": otp}})
+
+}
+
+func (cc *ConnectController) SubmitOTP(ctx *gin.Context) {
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	var patient models.Patient
+	result := cc.DB.First(&patient, "id = ?", currentUser.ID)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No post with that title exists"})
+		return
+	}
+	var payload = struct {
+		OTP string `json:"otp"`
+	}{}
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+
+	var connect models.Connect
+	date := time.Now()
+	result2 := cc.DB.First(&connect, "otp = ? AND expires_in >= ?", payload.OTP, date)
+	if result2.Error != nil {
+		// not fond this row / not match
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "success", "message": "OTP not match"})
+		return
+
+		// match
+	} else {
+		updatePatient := &models.Patient{
+			HN:                 connect.HN,
+			FirstName:          connect.FirstName,
+			LastName:           connect.LastName,
+			YearOfBirth:        connect.YearOfBirth,
+			Gender:             connect.Gender,
+			MainDoctorID:       connect.MainDoctorID,
+			AssistanceDoctorID: connect.AssistanceDoctorID,
+			DiseaseRisk:        connect.DiseaseRisk,
+		}
+
+		result := cc.DB.Model(&patient).Updates(updatePatient)
+		if result.Error != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update profile patient"})
+			return
+		}
+		cc.DB.Delete(&models.Connect{}, "otp = ?", payload.OTP)
+		cc.DB.Where("expires_in < ?", date).Delete(&models.Connect{})
+		ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "OTP matching"})
+
+	}
 
 }

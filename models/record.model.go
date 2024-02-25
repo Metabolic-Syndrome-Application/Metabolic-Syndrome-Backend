@@ -23,7 +23,7 @@ type RecordHealth struct {
 	LDL                    float32   `json:"ldl"`
 	Triglyceride           float32   `json:"triglyceride"`
 	RecordBy               string    `json:"recordBy"`
-	Timestamp              time.Time
+	Timestamp              time.Time `json:"timestamp"`
 }
 
 func (RecordHealth) TableName() string {
