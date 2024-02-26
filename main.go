@@ -26,6 +26,8 @@ var (
 	ChallengeRouteController routes.ChallengeRouteController
 	ConnectController        controllers.ConnectController
 	ConnectRouteController   routes.ConnectRouteController
+	RankController           controllers.RankController
+	RankRouteController      routes.RankRouteController
 )
 
 func init() {
@@ -57,6 +59,9 @@ func init() {
 	ConnectController = controllers.NewConnectController(initializers.DB)
 	ConnectRouteController = routes.NewConnectRouteController(ConnectController)
 
+	RankController = controllers.NewRankController(initializers.DB)
+	RankRouteController = routes.NewRankRouteController(RankController)
+
 	server = gin.Default()
 }
 
@@ -84,5 +89,6 @@ func main() {
 	RecordRouteController.RecordRoute(router)
 	ChallengeRouteController.ChallengeRoute(router)
 	ConnectRouteController.ConnectRoute(router)
+	RankRouteController.RankRoute(router)
 	log.Fatal(server.Run(":" + config.ServerPort))
 }
