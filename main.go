@@ -28,6 +28,8 @@ var (
 	ConnectRouteController   routes.ConnectRouteController
 	RankController           controllers.RankController
 	RankRouteController      routes.RankRouteController
+	KnowledgeController      controllers.KnowledgeController
+	KnowledgeRouteController routes.KnowledgeRouteController
 )
 
 func init() {
@@ -62,6 +64,9 @@ func init() {
 	RankController = controllers.NewRankController(initializers.DB)
 	RankRouteController = routes.NewRankRouteController(RankController)
 
+	KnowledgeController = controllers.NewKnowledgeController(initializers.DB)
+	KnowledgeRouteController = routes.NewKnowledgeRouteController(KnowledgeController)
+
 	server = gin.Default()
 }
 
@@ -90,5 +95,6 @@ func main() {
 	ChallengeRouteController.ChallengeRoute(router)
 	ConnectRouteController.ConnectRoute(router)
 	RankRouteController.RankRoute(router)
+	KnowledgeRouteController.KnowledgeRoute(router)
 	log.Fatal(server.Run(":" + config.ServerPort))
 }
