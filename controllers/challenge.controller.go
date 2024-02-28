@@ -328,20 +328,22 @@ func (cc *ChallengeController) GetAllDailyChallenge(ctx *gin.Context) {
 		return
 	}
 	type Response struct {
-		ID      uuid.UUID `json:"id"`
-		Name    string    `json:"name"`
-		Points  int       `json:"points"`
-		NumDays int       `json:"numDays"`
-		Status  string    `json:"status"`
+		ID           uuid.UUID `json:"id"`
+		Name         string    `json:"name"`
+		Points       int       `json:"points"`
+		NumDays      int       `json:"numDays"`
+		Status       string    `json:"status"`
+		Participants int       `json:"participants"`
 	}
 	var data []Response
 	for _, daily := range dailys {
 		response := Response{
-			ID:      daily.ID,
-			Name:    daily.Name,
-			Points:  daily.Points,
-			NumDays: daily.NumDays,
-			Status:  daily.Status,
+			ID:           daily.ID,
+			Name:         daily.Name,
+			Points:       daily.Points,
+			NumDays:      daily.NumDays,
+			Status:       daily.Status,
+			Participants: daily.Participants,
 		}
 		data = append(data, response)
 	}

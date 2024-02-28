@@ -25,6 +25,7 @@ func (rc *RankController) Top5(ctx *gin.Context) {
 	type Response struct {
 		Name          string `json:"name"`
 		CollectPoints int    `json:"collectPoints"`
+		Photo         string `json:"photo"`
 	}
 	var data []Response
 	for _, patient := range patients {
@@ -35,6 +36,7 @@ func (rc *RankController) Top5(ctx *gin.Context) {
 		response := Response{
 			Name:          name,
 			CollectPoints: patient.CollectPoints,
+			Photo:         patient.Photo,
 		}
 		data = append(data, response)
 	}
@@ -59,6 +61,7 @@ func (rc *RankController) MyRank(ctx *gin.Context) {
 		Rank          int64  `json:"rank"`
 		Name          string `json:"name"`
 		CollectPoints int    `json:"collectPoints"`
+		Photo         string `json:"photo"`
 	}
 	name := patient.Alias
 	if patient.Alias == "" {
@@ -68,6 +71,7 @@ func (rc *RankController) MyRank(ctx *gin.Context) {
 		Rank:          rank + 1,
 		Name:          name,
 		CollectPoints: patient.CollectPoints,
+		Photo:         patient.Photo,
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": data})
