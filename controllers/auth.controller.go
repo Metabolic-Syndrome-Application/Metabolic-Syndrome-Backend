@@ -201,7 +201,7 @@ func (ac *AuthController) SignInUser(ctx *gin.Context) {
 
 	if user.Role == "patient" {
 
-		ctx.JSON(http.StatusOK, gin.H{"status": "success", "access_token": access_token})
+		ctx.JSON(http.StatusOK, gin.H{"status": "success", "user": gin.H{"role": user.Role}, "access_token": access_token})
 	} else {
 		ctx.JSON(http.StatusOK, gin.H{"status": "success", "user": gin.H{"username": user.Username, "role": user.Role}, "access_token": access_token})
 
