@@ -19,5 +19,6 @@ func (kc *KnowledgeRouteController) KnowledgeRoute(rg *gin.RouterGroup) {
 
 	// Mobile
 	router.GET("/:disease", middleware.DeserializeUser(), kc.knowledgeController.GetKnowledge)
+	router.GET("/all", middleware.DeserializeUser(), kc.knowledgeController.GetAllKnowledge)
 
 }

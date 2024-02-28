@@ -9,6 +9,7 @@ import (
 type Knowledge struct {
 	ID          uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id"`
 	Disease     string    `json:"disease"`
+	Photo       string    `json:"photo"`
 	Name        string    `json:"name"`
 	Details     string    `json:"details"`
 	Symptoms    string    `json:"symptoms"`

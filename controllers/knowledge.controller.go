@@ -45,3 +45,34 @@ func (kc *KnowledgeController) GetKnowledge(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": data})
 
 }
+
+// Get all Knowledge
+func (kc *KnowledgeController) GetAllKnowledge(ctx *gin.Context) {
+	var knowledges []models.Knowledge
+	result := kc.DB.Find(&knowledges)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have disease"})
+		return
+	}
+
+	type Response struct {
+		Disease string `json:"disease"`
+		Photo   string `json:"photo"`
+		Name    string `json:"name"`
+		Details string `json:"details"`
+	}
+
+	var data []Response
+	for _, knowledge := range knowledges {
+		response := Response{
+			Disease: knowledge.Disease,
+			Photo:   knowledge.Photo,
+			Name:    knowledge.Name,
+			Details: knowledge.Details,
+		}
+		data = append(data, response)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": data})
+
+}

@@ -10,6 +10,7 @@ func SeedKnowledge(db *gorm.DB) {
 		{
 			Disease:     "diabetes",
 			Name:        "โรคเบาหวาน",
+			Photo:       "photo.png",
 			Details:     "",
 			Symptoms:    "Increased thirst, frequent urination, extreme hunger, unexplained weight loss, fatigue, blurred vision, etc.",
 			Medications: "Insulin, Metformin, Sulfonylureas, etc.",
@@ -18,6 +19,7 @@ func SeedKnowledge(db *gorm.DB) {
 		{
 			Disease:     "hypertension",
 			Name:        "โรคความดันโลหิตสูง",
+			Photo:       "photo.png",
 			Details:     "",
 			Symptoms:    "Headaches, shortness of breath, nosebleeds, chest pain, vision changes, etc.",
 			Medications: "Diuretics, ACE inhibitors, Calcium channel blockers, etc.",
@@ -26,6 +28,7 @@ func SeedKnowledge(db *gorm.DB) {
 		{
 			Disease:     "obesity",
 			Name:        "โรคอ้วน",
+			Photo:       "photo.png",
 			Details:     "",
 			Symptoms:    "Increased body weight, fatigability, joint pain, breathlessness, snoring, etc.",
 			Medications: "Orlistat, Phentermine, Liraglutide, etc.",
@@ -34,6 +37,7 @@ func SeedKnowledge(db *gorm.DB) {
 		{
 			Disease:     "hyperlipidemia",
 			Name:        "ภาวะไขมันในเลือดสูง",
+			Photo:       "photo.png",
 			Details:     "",
 			Symptoms:    "Chest pain, yellowish skin, fatty deposits under the skin, etc.",
 			Medications: "Statins, Fibrates, Niacin, etc.",
