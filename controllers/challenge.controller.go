@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -88,6 +89,20 @@ func (cc *ChallengeController) UpdateQuizChallenge(ctx *gin.Context) {
 // delete quiz challenge
 func (cc *ChallengeController) DeleteQuizChallenge(ctx *gin.Context) {
 	quizID := ctx.Param("id")
+	var quizDefaults []models.QuizChallenge
+	cc.DB.Order("created_at asc").Limit(10).Find(&quizDefaults)
+	found := false
+	for _, quiz := range quizDefaults {
+		if fmt.Sprintf("%v", quiz.ID) == quizID {
+			found = true
+			break
+		}
+	}
+
+	if found {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not Delete Quiz Challenge, Default challenge"})
+		return
+	}
 	result := cc.DB.Delete(&models.QuizChallenge{}, "id = ?", quizID)
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No quiz with that ID exists"})
