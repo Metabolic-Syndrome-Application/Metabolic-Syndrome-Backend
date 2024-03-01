@@ -28,12 +28,7 @@ func (cc *ConnectController) GenerateOTP(ctx *gin.Context) {
 		Gender             string     `json:"gender"`
 		MainDoctorID       *uuid.UUID `gorm:"type:uuid ;null" json:"mainDoctorID"`
 		AssistanceDoctorID *uuid.UUID `gorm:"type:uuid ;null" json:"assistanceDoctorID"`
-		DiseaseRisk        struct {
-			Diabetes       string `json:"diabetes"`
-			Hyperlipidemia string `json:"hyperlipidemia"`
-			Hypertension   string `json:"hypertension"`
-			Obesity        string `json:"obesity"`
-		} `json:"diseaseRisk"`
+		Disease            *string    `json:"disease"`
 	}{}
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
@@ -53,7 +48,7 @@ func (cc *ConnectController) GenerateOTP(ctx *gin.Context) {
 		Gender:             payload.Gender,
 		MainDoctorID:       payload.MainDoctorID,
 		AssistanceDoctorID: payload.AssistanceDoctorID,
-		DiseaseRisk:        payload.DiseaseRisk,
+		Disease:            payload.Disease,
 	}
 	if err := cc.DB.Create(&newConnect).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not create connect"})
@@ -132,7 +127,7 @@ func (cc *ConnectController) SubmitOTP(ctx *gin.Context) {
 			Gender:             connect.Gender,
 			MainDoctorID:       connect.MainDoctorID,
 			AssistanceDoctorID: connect.AssistanceDoctorID,
-			DiseaseRisk:        connect.DiseaseRisk,
+			Disease:            connect.Disease,
 		}
 
 		result := cc.DB.Model(&patient).Updates(updatePatient)

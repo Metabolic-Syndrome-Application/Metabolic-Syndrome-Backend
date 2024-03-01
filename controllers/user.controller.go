@@ -407,21 +407,16 @@ func (uc *UserController) UpdateOtherProfile(ctx *gin.Context) {
 		}
 
 		var payload = struct {
-			HN                 *string    `json:"hn"`
-			FirstName          string     `json:"firstName"`
-			LastName           string     `json:"lastName"`
-			YearOfBirth        int        `json:"yearOfBirth"`
-			Gender             string     `json:"gender"`
-			MainDoctorID       *uuid.UUID `gorm:"type:uuid;null" json:"mainDoctorID"`
-			AssistanceDoctorID *uuid.UUID `gorm:"type:uuid;null" json:"assistanceDoctorID"`
-			DiseaseRisk        struct {
-				Diabetes       string `json:"diabetes"`
-				Hyperlipidemia string `json:"hyperlipidemia"`
-				Hypertension   string `json:"hypertension"`
-				Obesity        string `json:"obesity"`
-			} `json:"diseaseRisk"`
-			PlanID pq.StringArray `gorm:"type:uuid[];column:plan_id" json:"planID"`
-			Status string         `gorm:"default:'in process'" json:"status"`
+			HN                 *string        `json:"hn"`
+			FirstName          string         `json:"firstName"`
+			LastName           string         `json:"lastName"`
+			YearOfBirth        int            `json:"yearOfBirth"`
+			Gender             string         `json:"gender"`
+			MainDoctorID       *uuid.UUID     `gorm:"type:uuid;null" json:"mainDoctorID"`
+			AssistanceDoctorID *uuid.UUID     `gorm:"type:uuid;null" json:"assistanceDoctorID"`
+			Disease            *string        `json:"disease"`
+			PlanID             pq.StringArray `gorm:"type:uuid[];column:plan_id" json:"planID"`
+			Status             string         `gorm:"default:'in process'" json:"status"`
 		}{}
 
 		if err := ctx.ShouldBindJSON(&payload); err != nil {
@@ -446,7 +441,7 @@ func (uc *UserController) UpdateOtherProfile(ctx *gin.Context) {
 			Gender:             payload.Gender,
 			MainDoctorID:       payload.MainDoctorID,
 			AssistanceDoctorID: payload.AssistanceDoctorID,
-			DiseaseRisk:        payload.DiseaseRisk,
+			Disease:            payload.Disease,
 			PlanID:             planID,
 			Status:             payload.Status,
 		}
