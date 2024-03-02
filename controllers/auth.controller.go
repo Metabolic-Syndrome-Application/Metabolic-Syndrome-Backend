@@ -195,9 +195,9 @@ func (ac *AuthController) SignInUser(ctx *gin.Context) {
 		return
 	}
 
-	ctx.SetCookie("access_token", access_token, config.AccessTokenMaxAge*60, "/", "localhost", false, true)
-	ctx.SetCookie("refresh_token", refresh_token, config.RefreshTokenMaxAge*60, "/", "localhost", false, true)
-	ctx.SetCookie("logged_in", "true", config.AccessTokenMaxAge*60, "/", "localhost", false, false)
+	ctx.SetCookie("access_token", access_token, config.AccessTokenMaxAge*60, "/", config.HOST, false, true)
+	ctx.SetCookie("refresh_token", refresh_token, config.RefreshTokenMaxAge*60, "/", config.HOST, false, true)
+	ctx.SetCookie("logged_in", "true", config.AccessTokenMaxAge*60, "/", config.HOST, false, false)
 
 	if user.Role == "patient" {
 
