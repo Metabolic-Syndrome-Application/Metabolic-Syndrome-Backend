@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lib/pq"
 	"github.com/ployns/Metabolic-Syndrome-Backend/models"
 	"gorm.io/gorm"
 )
@@ -79,8 +80,23 @@ func (sc *ScreeningController) MetabolicRisk(ctx *gin.Context) {
 
 	// result
 	metabolicRisk := ""
+
 	if risk <= 1 {
 		metabolicRisk = "low"
+		var planExercise models.Plan
+		var planFood models.Plan
+		var planRest models.Plan
+		sc.DB.First(&planExercise, "name = 'โปรแกรมออกกำลังกายเมตาบอลิกซินโดรม'")
+		sc.DB.First(&planFood, "name = 'โปรแกรมอาหารเมตาบอลิกซินโดรม'")
+		sc.DB.First(&planRest, "name = 'โปรแกรมการพักผ่อนเมตาบอลิกซินโดรม'")
+
+		// connect hospital and have planID => not add plan default
+		var planID pq.StringArray
+		if ProfilePatient.HN != nil && ProfilePatient.PlanID != nil {
+			planID = ProfilePatient.PlanID
+		} else {
+			planID = pq.StringArray{planExercise.ID.String(), planFood.ID.String(), planRest.ID.String()}
+		}
 
 		updateRisk := &models.Patient{
 			DiseaseRisk: models.DiseaseRisk{
@@ -88,6 +104,7 @@ func (sc *ScreeningController) MetabolicRisk(ctx *gin.Context) {
 				Hyperlipidemia: "metabolicLow",
 				Hypertension:   "metabolicLow",
 				Obesity:        "metabolicLow"},
+			PlanID: planID,
 		}
 
 		result := sc.DB.Model(&ProfilePatient).Updates(updateRisk)
@@ -95,6 +112,21 @@ func (sc *ScreeningController) MetabolicRisk(ctx *gin.Context) {
 			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update profile Staff"})
 			return
 		}
+
+		// table patient_plan fotr patient.Plan
+		var plans []models.Plan
+		var plansToRemove []models.Plan
+
+		sc.DB.Find(&plansToRemove)
+		sc.DB.Model(&ProfilePatient).Association("Plan").Delete(&plansToRemove)
+
+		for _, planID := range ProfilePatient.PlanID {
+
+			sc.DB.Where("id = ?", planID).Find(&plans)
+			sc.DB.Model(&ProfilePatient).Association("Plan").Append(&plans)
+
+		}
+
 	} else if risk == 2 {
 		metabolicRisk = "medium"
 		updateRisk := &models.Patient{
@@ -187,6 +219,9 @@ func (sc *ScreeningController) DiseaseRisk(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
 		return
 	}
+	var planExercise models.Plan
+	var planFood models.Plan
+	var planRest models.Plan
 
 	//screening diabetes
 	calDiabetes := func() string {
@@ -309,18 +344,54 @@ func (sc *ScreeningController) DiseaseRisk(ctx *gin.Context) {
 		}
 	}
 
+	if calDiabetes() == "high" || calHyperlipidemia() == "high" || calHypertension() == "high" || calObesity() == "high" {
+		sc.DB.First(&planExercise, "name = 'โปรแกรมออกกำลังกายความเสี่ยงสูง'")
+		sc.DB.First(&planFood, "name = 'โปรแกรมอาหารความเสี่ยงสูง'")
+		sc.DB.First(&planRest, "name = 'โปรแกรมการพักผ่อนความเสี่ยงสูง'")
+	} else if calDiabetes() == "medium" || calHyperlipidemia() == "medium" || calHypertension() == "medium" || calObesity() == "medium" {
+		sc.DB.First(&planExercise, "name = 'โปรแกรมออกกำลังกายความเสี่ยงกลาง'")
+		sc.DB.First(&planFood, "name = 'โปรแกรมอาหารความเสี่ยงกลาง'")
+		sc.DB.First(&planRest, "name = 'โปรแกรมการพักผ่อนความเสี่ยงกลาง'")
+	} else {
+		sc.DB.First(&planExercise, "name = 'โปรแกรมออกกำลังกายความเสี่ยงต่ำ'")
+		sc.DB.First(&planFood, "name = 'โปรแกรมอาหารความเสี่ยงต่ำ'")
+		sc.DB.First(&planRest, "name = 'โปรแกรมการพักผ่อนความเสี่ยงต่ำ'")
+	}
+
+	// connect hospital and have planID => not add plan default
+	var planID pq.StringArray
+	if ProfilePatient.HN != nil && ProfilePatient.PlanID != nil {
+		planID = ProfilePatient.PlanID
+	} else {
+		planID = pq.StringArray{planExercise.ID.String(), planFood.ID.String(), planRest.ID.String()}
+	}
+
 	updateDiseaseRisk := &models.Patient{
 		DiseaseRisk: models.DiseaseRisk{
 			Diabetes:       calDiabetes(),
 			Hyperlipidemia: calHyperlipidemia(),
 			Hypertension:   calHypertension(),
 			Obesity:        calObesity()},
+		PlanID: planID,
 	}
 
 	a := sc.DB.Model(&ProfilePatient).Updates(updateDiseaseRisk)
 	if a.Error != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update DiseaseRisk"})
 		return
+	}
+	// table patient_plan fotr patient.Plan
+	var plans []models.Plan
+	var plansToRemove []models.Plan
+
+	sc.DB.Find(&plansToRemove)
+	sc.DB.Model(&ProfilePatient).Association("Plan").Delete(&plansToRemove)
+
+	for _, planID := range ProfilePatient.PlanID {
+
+		sc.DB.Where("id = ?", planID).Find(&plans)
+		sc.DB.Model(&ProfilePatient).Association("Plan").Append(&plans)
+
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"diseaseRisk": ProfilePatient.DiseaseRisk}})

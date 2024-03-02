@@ -35,8 +35,25 @@ func (cc *ConnectController) GenerateOTP(ctx *gin.Context) {
 		return
 	}
 
+	date := time.Now()
+	cc.DB.Where("expires_in < ?", date).Delete(&models.Connect{})
+
 	otp := utils.GenerateOTP(4)
 	expiredIn := time.Now().Add(3 * time.Minute)
+
+	var patient models.Patient
+	existingHN := cc.DB.First(&patient, "hn = ?", payload.HN)
+	if existingHN.Error == nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "This hn is already in use"})
+		return
+	}
+
+	var connect models.Connect
+	existingHN2 := cc.DB.First(&connect, "hn = ?", payload.HN)
+	if existingHN2.Error == nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "This hn is already in use"})
+		return
+	}
 
 	newConnect := models.Connect{
 		OTP:                otp,
@@ -107,18 +124,6 @@ func (cc *ConnectController) SubmitOTP(ctx *gin.Context) {
 
 		// match
 	} else {
-		// var diseaseRisk struct {
-		// 	Diabetes       string `json:"diabetes"`
-		// 	Hyperlipidemia string `json:"hyperlipidemia"`
-		// 	Hypertension   string `json:"hypertension"`
-		// 	Obesity        string `json:"obesity"`
-		// }
-		// if connect.DiseaseRisk.Diabetes == "" {
-		// 	diseaseRisk = patient.DiseaseRisk
-		// } else {
-		// 	diseaseRisk = connect.DiseaseRisk
-		// }
-
 		updatePatient := &models.Patient{
 			HN:                 connect.HN,
 			FirstName:          connect.FirstName,

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -103,7 +104,7 @@ func (pc *PlanController) GetPlan(ctx *gin.Context) {
 // Get all plan
 func (pc *PlanController) GetAllPlan(ctx *gin.Context) {
 	var plans []models.Plan
-	result := pc.DB.Find(&plans)
+	result := pc.DB.Order("created_at ASC").Offset(12).Find(&plans)
 	if result.Error != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "not have plan data"})
 		return
@@ -128,6 +129,20 @@ func (pc *PlanController) GetAllPlan(ctx *gin.Context) {
 // Delete plan
 func (pc *PlanController) DeletePlan(ctx *gin.Context) {
 	planID := ctx.Param("id")
+	var planDefaults []models.Plan
+	pc.DB.Order("created_at asc").Limit(12).Find(&planDefaults)
+	found := false
+	for _, plan := range planDefaults {
+		if fmt.Sprintf("%v", plan.ID) == planID {
+			found = true
+			break
+		}
+	}
+
+	if found {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not Delete plan, Default plan"})
+		return
+	}
 	// Delete the references to the plan from the patient_plan table
 	if err := pc.DB.Exec("DELETE FROM patient_plan WHERE plan_id = ?", planID).Error; err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "fail", "message": "Failed to delete references to the plan"})
@@ -157,6 +172,10 @@ func (pc *PlanController) DeletePlan(ctx *gin.Context) {
 				return
 			}
 		}
+	}
+	if err := pc.DB.Model(&models.Patient{}).Where("plan_id = '{}'").Update("plan_id", nil).Error; err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "fail", "message": "error"})
+		return
 	}
 
 	// Now you can safely delete the plan

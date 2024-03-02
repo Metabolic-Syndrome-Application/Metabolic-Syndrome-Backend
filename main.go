@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/ployns/Metabolic-Syndrome-Backend/controllers"
 	"github.com/ployns/Metabolic-Syndrome-Backend/initializers"
+	"github.com/ployns/Metabolic-Syndrome-Backend/migrate"
 	"github.com/ployns/Metabolic-Syndrome-Backend/routes"
 )
 
@@ -75,6 +76,8 @@ func main() {
 	if err != nil {
 		log.Fatal("? Could not load environment variables", err)
 	}
+
+	migrate.Migrate()
 
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowOrigins = []string{"http://localhost:8000", config.ClientOrigin}

@@ -318,6 +318,21 @@ func (cc *ChallengeController) GetDailyChallenge(ctx *gin.Context) {
 func (cc *ChallengeController) DeleteDailyChallenge(ctx *gin.Context) {
 	dailyID := ctx.Param("id")
 
+	var dailyDefaults []models.DailyChallenge
+	cc.DB.Order("created_at asc").Limit(5).Find(&dailyDefaults)
+	found := false
+	for _, daily := range dailyDefaults {
+		if fmt.Sprintf("%v", daily.ID) == dailyID {
+			found = true
+			break
+		}
+	}
+
+	if found {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not Delete daily Challenge, Default challenge"})
+		return
+	}
+
 	// find patient that have this dailyID
 	if err := cc.DB.Model(&models.Patient{}).Where("challenge_id = ?", dailyID).Update("challenge_id", nil).Error; err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "fail", "message": "error"})
