@@ -30,6 +30,8 @@ func main() {
 	if !hasData(initializers.DB) {
 		seeds.SeedKnowledge(initializers.DB)
 		seeds.SeedQuiz(initializers.DB)
+		seeds.SeedDaily(initializers.DB)
+		seeds.SeedPlan(initializers.DB)
 	}
 }
 func hasData(db *gorm.DB) bool {

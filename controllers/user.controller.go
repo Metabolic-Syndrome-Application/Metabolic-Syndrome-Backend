@@ -108,7 +108,7 @@ func (uc *UserController) UpdateProfile(ctx *gin.Context) {
 
 			result2 := uc.DB.Create(&newRecordDaily)
 			if result2.Error != nil {
-				ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not create Record dairy"})
+				ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not create Record daily"})
 				return
 			}
 			ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Update profile patient success, Start challenge!"})
