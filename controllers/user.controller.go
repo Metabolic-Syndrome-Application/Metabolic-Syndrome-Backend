@@ -424,6 +424,13 @@ func (uc *UserController) UpdateOtherProfile(ctx *gin.Context) {
 			return
 		}
 
+		var patientHN models.Patient
+		existingHN := uc.DB.First(&patientHN, "hn = ?", payload.HN)
+		if existingHN.Error == nil && patientHN.ID != patient.ID {
+			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "This HN is already in use"})
+			return
+		}
+
 		// planID = null => planDefault (Original plan)
 		var planID pq.StringArray
 		if payload.PlanID == nil {
