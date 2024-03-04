@@ -30,7 +30,9 @@ func (rc *RankController) Top5(ctx *gin.Context) {
 	var data []Response
 	for _, patient := range patients {
 		name := patient.Alias
-		if patient.Alias == "" {
+		if patient.Alias == "" && patient.FirstName == "" {
+			name = "anonymous"
+		} else if patient.Alias == "" {
 			name = patient.FirstName
 		}
 		response := Response{
