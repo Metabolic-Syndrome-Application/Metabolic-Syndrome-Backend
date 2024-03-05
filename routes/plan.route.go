@@ -20,7 +20,8 @@ func (pc *PlanRouteController) PlanRoute(rg *gin.RouterGroup) {
 	router.POST("/create", middleware.DeserializeUser(), pc.planController.CreatePlan)
 	router.PUT("/:id", middleware.DeserializeUser(), pc.planController.UpdatePlan)
 	router.GET("/:id", middleware.DeserializeUser(), pc.planController.GetPlan)
-	router.GET("/all", middleware.DeserializeUser(), pc.planController.GetAllPlan)
+	router.GET("/all", middleware.DeserializeUser(), pc.planController.GetAllPlan)                    // not have default
+	router.GET("/all-default", middleware.DeserializeUser(), pc.planController.GetAllPlanHaveDefault) // have default
 	router.DELETE("/:id", middleware.DeserializeUser(), pc.planController.DeletePlan)
 
 }

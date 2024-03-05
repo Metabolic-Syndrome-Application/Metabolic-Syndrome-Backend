@@ -126,6 +126,31 @@ func (pc *PlanController) GetAllPlan(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"plan": data}})
 }
 
+// Get all plan (have default)
+func (pc *PlanController) GetAllPlanHaveDefault(ctx *gin.Context) {
+	var plans []models.Plan
+	result := pc.DB.Order("created_at ASC").Find(&plans)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "not have plan data"})
+		return
+	}
+	type Response struct {
+		ID   uuid.UUID `json:"id"`
+		Name string    `json:"name,omitempty"`
+		Type string    `json:"type,omitempty"`
+	}
+	var data []Response
+	for _, plan := range plans {
+		response := Response{
+			ID:   plan.ID,
+			Name: plan.Name,
+			Type: plan.Type,
+		}
+		data = append(data, response)
+	}
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": gin.H{"plan": data}})
+}
+
 // Delete plan
 func (pc *PlanController) DeletePlan(ctx *gin.Context) {
 	planID := ctx.Param("id")
