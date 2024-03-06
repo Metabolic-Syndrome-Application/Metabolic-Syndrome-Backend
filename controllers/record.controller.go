@@ -1041,6 +1041,56 @@ func (rc *RecordController) UpdateRecordPlanListByDate(ctx *gin.Context) {
 		return
 	}
 
+	now := time.Now().Format("2006-01-02")
+	dateNow, _ := time.ParseInLocation("2006-01-02", now, time.Now().Location())
+
+	if date == dateNow {
+		// change data List from json.RawMessage to []models.List
+		var listData []models.List
+		if err := json.Unmarshal(recordPlan.List, &listData); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not Unmarshal"})
+			return
+		}
+
+		allChecked := true
+		for _, listItem := range listData {
+			if listItem.Check != true {
+				allChecked = false
+				break
+			}
+		}
+
+		if (recordPlan.GetPoint == false) && allChecked {
+
+			// every ListItem in List have Check = "true"
+			updateGetPoint := &models.RecordPlan{
+				GetPoint: true,
+			}
+
+			result = rc.DB.Model(&recordPlan).Updates(updateGetPoint)
+			if result.Error != nil {
+				ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update plan list"})
+				return
+			}
+
+			var patient models.Patient
+			result := rc.DB.First(&patient, "id = ?", currentUser.ID)
+			if result.Error != nil {
+				ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not have this ID"})
+				return
+			}
+
+			updatePoint := &models.Patient{
+				CollectPoints: patient.CollectPoints + 100,
+			}
+			result = rc.DB.Model(&patient).Updates(updatePoint)
+			if result.Error != nil {
+				ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update plan list"})
+				return
+			}
+		}
+	}
+
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Update plan list success"})
 
 }
