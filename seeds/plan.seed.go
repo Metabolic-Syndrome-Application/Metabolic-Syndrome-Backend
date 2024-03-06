@@ -14,7 +14,7 @@ func SeedPlan(db *gorm.DB) {
 			Name:        "โปรแกรมออกกำลังกายความเสี่ยงต่ำ",
 			Type:        "exercise",
 			Description: "โปรแกรมออกกำลังกายความเสี่ยงต่ำ สำหรับผู้ที่มีความเสี่ยงโรคต่ำ",
-			Photo:       "โปรแกรมออกกำลังกายความเสี่ยงต่ำ.png",
+			Photo:       "https://firebasestorage.googleapis.com/v0/b/metabolic-b97d2.appspot.com/o/image%2FplanDefault.svg?alt=media&token=bc0c8adc-5cb0-441a-b634-fedc9185643d",
 			Detail: models.Detail{
 				Name: []string{"ออกกำลังกาย 30 นาที"},
 				Day:  []string{"monday", "wednesday", "friday"},
@@ -25,7 +25,7 @@ func SeedPlan(db *gorm.DB) {
 			Name:        "โปรแกรมอาหารความเสี่ยงต่ำ",
 			Type:        "food",
 			Description: "โปรแกรมอาหารความเสี่ยงต่ำ สำหรับผู้ที่มีความเสี่ยงโรคต่ำ",
-			Photo:       "โปรแกรมอาหารความเสี่ยงต่ำ.png",
+			Photo:       "https://firebasestorage.googleapis.com/v0/b/metabolic-b97d2.appspot.com/o/image%2FplanDefault.svg?alt=media&token=bc0c8adc-5cb0-441a-b634-fedc9185643d",
 			Detail: models.Detail{
 				Name: []string{"กินผักและผลไม้ เช่น ส้ม ฝรั่ง กล้วย", "ดื่มน้ำวันละ 8 แก้ว"},
 				Day:  []string{"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"},
@@ -36,7 +36,7 @@ func SeedPlan(db *gorm.DB) {
 			Name:        "โปรแกรมการพักผ่อนความเสี่ยงต่ำ",
 			Type:        "rest",
 			Description: "โปรแกรมการพักผ่อนความเสี่ยงต่ำ สำหรับผู้ที่มีความเสี่ยงโรคต่ำ",
-			Photo:       "โปรแกรมการพักผ่อนความเสี่ยงต่ำ.png",
+			Photo:       "https://firebasestorage.googleapis.com/v0/b/metabolic-b97d2.appspot.com/o/image%2FplanDefault.svg?alt=media&token=bc0c8adc-5cb0-441a-b634-fedc9185643d",
 			Detail: models.Detail{
 				Name: []string{"เข้านอนก่อน 4 ทุ่ม หรือนอนครบ 8 ชั่วโมง"},
 				Day:  []string{"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"},
@@ -49,7 +49,7 @@ func SeedPlan(db *gorm.DB) {
 			Name:        "โปรแกรมออกกำลังกายความเสี่ยงกลาง",
 			Type:        "exercise",
 			Description: "โปรแกรมออกกำลังกายความเสี่ยงกลาง สำหรับผู้ที่มีความเสี่ยงโรคกลาง",
-			Photo:       "โปรแกรมออกกำลังกายความเสี่ยงกลาง.png",
+			Photo:       "https://firebasestorage.googleapis.com/v0/b/metabolic-b97d2.appspot.com/o/image%2FplanDefault.svg?alt=media&token=bc0c8adc-5cb0-441a-b634-fedc9185643d",
 			Detail: models.Detail{
 				Name: []string{"ออกกำลังกาย 30 นาที"},
 				Day:  []string{"monday", "tuesday", "wednesday", "thursday", "friday"},
@@ -60,7 +60,7 @@ func SeedPlan(db *gorm.DB) {
 			Name:        "โปรแกรมอาหารความเสี่ยงกลาง",
 			Type:        "food",
 			Description: "โปรแกรมอาหารความเสี่ยงกลาง สำหรับผู้ที่มีความเสี่ยงโรคกลาง",
-			Photo:       "โปรแกรมอาหารความเสี่ยงกลาง.png",
+			Photo:       "https://firebasestorage.googleapis.com/v0/b/metabolic-b97d2.appspot.com/o/image%2FplanDefault.svg?alt=media&token=bc0c8adc-5cb0-441a-b634-fedc9185643d",
 			Detail: models.Detail{
 				Name: []string{"กินผักและผลไม้ เช่น ส้ม ฝรั่ง กล้วย", "ดื่มน้ำวันละ 8 แก้ว", "ไม่ทานอาหารรสจัด เช่น ส้มตำ"},
 				Day:  []string{"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"},
@@ -71,7 +71,7 @@ func SeedPlan(db *gorm.DB) {
 			Name:        "โปรแกรมการพักผ่อนความเสี่ยงกลาง",
 			Type:        "rest",
 			Description: "โปรแกรมการพักผ่อนความเสี่ยงกลาง สำหรับผู้ที่มีความเสี่ยงโรคกลาง",
-			Photo:       "โปรแกรมการพักผ่อนความเสี่ยงกลาง.png",
+			Photo:       "https://firebasestorage.googleapis.com/v0/b/metabolic-b97d2.appspot.com/o/image%2FplanDefault.svg?alt=media&token=bc0c8adc-5cb0-441a-b634-fedc9185643d",
 			Detail: models.Detail{
 				Name: []string{"เข้านอนก่อน 4 ทุ่ม หรือนอนครบ 8 ชั่วโมง"},
 				Day:  []string{"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"},
@@ -84,7 +84,7 @@ func SeedPlan(db *gorm.DB) {
 			Name:        "โปรแกรมออกกำลังกายความเสี่ยงสูง",
 			Type:        "exercise",
 			Description: "โปรแกรมออกกำลังกายความเสี่ยงสูง สำหรับผู้ที่มีความเสี่ยงโรคสูง",
-			Photo:       "โปรแกรมออกกำลังกายความเสี่ยงสูง.png",
+			Photo:       "https://firebasestorage.googleapis.com/v0/b/metabolic-b97d2.appspot.com/o/image%2FplanDefault.svg?alt=media&token=bc0c8adc-5cb0-441a-b634-fedc9185643d",
 			Detail: models.Detail{
 				Name: []string{"ออกกำลังกาย 30 นาที"},
 				Day:  []string{"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"},
@@ -95,7 +95,7 @@ func SeedPlan(db *gorm.DB) {
 			Name:        "โปรแกรมอาหารความเสี่ยงสูง",
 			Type:        "food",
 			Description: "โปรแกรมอาหารความเสี่ยงสูง สำหรับผู้ที่มีความเสี่ยงโรคสูง",
-			Photo:       "โปรแกรมอาหารความเสี่ยงสูง.png",
+			Photo:       "https://firebasestorage.googleapis.com/v0/b/metabolic-b97d2.appspot.com/o/image%2FplanDefault.svg?alt=media&token=bc0c8adc-5cb0-441a-b634-fedc9185643d",
 			Detail: models.Detail{
 				Name: []string{"กินผักและผลไม้ เช่น ส้ม ฝรั่ง กล้วย", "ดื่มน้ำวันละ 8 แก้ว", "ไม่ทานอาหารรสจัด เช่น ส้มตำ", "ไม่ทานอาหารที่มีคลอเรสเตอรอลสูง เช่น อาการทะเล เครื่องในสัตว์"},
 				Day:  []string{"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"},
@@ -106,7 +106,7 @@ func SeedPlan(db *gorm.DB) {
 			Name:        "โปรแกรมการพักผ่อนความเสี่ยงสูง",
 			Type:        "rest",
 			Description: "โปรแกรมการพักผ่อนความเสี่ยงสูง สำหรับผู้ที่มีความเสี่ยงโรคสูง",
-			Photo:       "โปรแกรมการพักผ่อนความเสี่ยงสูง.png",
+			Photo:       "https://firebasestorage.googleapis.com/v0/b/metabolic-b97d2.appspot.com/o/image%2FplanDefault.svg?alt=media&token=bc0c8adc-5cb0-441a-b634-fedc9185643d",
 			Detail: models.Detail{
 				Name: []string{"เข้านอนก่อน 4 ทุ่ม หรือนอนครบ 8 ชั่วโมง"},
 				Day:  []string{"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"},
@@ -119,7 +119,7 @@ func SeedPlan(db *gorm.DB) {
 			Name:        "โปรแกรมออกกำลังกายเมตาบอลิกซินโดรม",
 			Type:        "exercise",
 			Description: "โปรแกรมออกกำลังกายเมตาบอลิกซินโดรม สำหรับผู้ที่มีความเสี่ยงเมตาบอลิกซินโดรม",
-			Photo:       "โปรแกรมออกกำลังกายเมตาบอลิกซินโดรม.png",
+			Photo:       "https://firebasestorage.googleapis.com/v0/b/metabolic-b97d2.appspot.com/o/image%2FplanDefault.svg?alt=media&token=bc0c8adc-5cb0-441a-b634-fedc9185643d",
 			Detail: models.Detail{
 				Name: []string{"ออกกำลังกาย 30 นาที"},
 				Day:  []string{"monday", "wednesday", "friday"},
@@ -130,7 +130,7 @@ func SeedPlan(db *gorm.DB) {
 			Name:        "โปรแกรมอาหารเมตาบอลิกซินโดรม",
 			Type:        "food",
 			Description: "โปรแกรมอาหารเมตาบอลิกซินโดรม สำหรับผู้ที่มีความเสี่ยงเมตาบอลิกซินโดรม",
-			Photo:       "โปรแกรมอาหารเมตาบอลิกซินโดรม.png",
+			Photo:       "https://firebasestorage.googleapis.com/v0/b/metabolic-b97d2.appspot.com/o/image%2FplanDefault.svg?alt=media&token=bc0c8adc-5cb0-441a-b634-fedc9185643d",
 			Detail: models.Detail{
 				Name: []string{"ดื่มน้ำวันละ 8 แก้ว"},
 				Day:  []string{"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"},
@@ -141,7 +141,7 @@ func SeedPlan(db *gorm.DB) {
 			Name:        "โปรแกรมการพักผ่อนเมตาบอลิกซินโดรม",
 			Type:        "rest",
 			Description: "โปรแกรมการพักผ่อนเมตาบอลิกซินโดรม สำหรับผู้ที่มีความเสี่ยงเมตาบอลิกซินโดรม",
-			Photo:       "โปรแกรมการพักผ่อนเมตาบอลิกซินโดรม.png",
+			Photo:       "https://firebasestorage.googleapis.com/v0/b/metabolic-b97d2.appspot.com/o/image%2FplanDefault.svg?alt=media&token=bc0c8adc-5cb0-441a-b634-fedc9185643d",
 			Detail: models.Detail{
 				Name: []string{"เข้านอนก่อน 4 ทุ่ม หรือนอนครบ 8 ชั่วโมง"},
 				Day:  []string{"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"},
