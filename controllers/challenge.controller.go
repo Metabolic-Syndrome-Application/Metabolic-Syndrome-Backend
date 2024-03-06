@@ -396,6 +396,7 @@ func (cc *ChallengeController) GetAllActiveDailyChallenge(ctx *gin.Context) {
 	type Response struct {
 		ID      uuid.UUID `json:"id"`
 		Name    string    `json:"name"`
+		Photo   string    `json:"photo"`
 		Points  int       `json:"points"`
 		NumDays int       `json:"numDays"`
 	}
@@ -404,6 +405,7 @@ func (cc *ChallengeController) GetAllActiveDailyChallenge(ctx *gin.Context) {
 		response := Response{
 			ID:      daily.ID,
 			Name:    daily.Name,
+			Photo:   daily.Photo,
 			Points:  daily.Points,
 			NumDays: daily.NumDays,
 		}
