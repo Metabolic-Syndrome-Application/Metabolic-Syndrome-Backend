@@ -650,3 +650,22 @@ func (uc *UserController) DeleteUser(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, gin.H{"status": "success"})
 }
+
+func (uc *UserController) CheckHN(ctx *gin.Context) {
+	var payload = struct {
+		HN *string `json:"hn"`
+	}{}
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+	var patientHN models.Patient
+	existingHN := uc.DB.First(&patientHN, "hn = ?", payload.HN)
+	if existingHN.Error == nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "This HN is already in use"})
+		return
+	} else {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "success", "message": "This HN can use"})
+		return
+	}
+}

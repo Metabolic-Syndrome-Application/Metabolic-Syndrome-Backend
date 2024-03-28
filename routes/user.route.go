@@ -27,4 +27,6 @@ func (uc *UserRouteController) UserRoute(rg *gin.RouterGroup) {
 	router.GET("/profile/:role/:id", middleware.DeserializeUser(), uc.userController.GetOtherProfile)    // get profile other profile
 	router.DELETE("/profile/:role/:id", middleware.DeserializeUser(), uc.userController.DeleteUser)      // delete user
 
+	router.POST("/check-hn", middleware.DeserializeUser(), uc.userController.CheckHN) //check hn
+
 }
