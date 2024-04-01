@@ -176,7 +176,7 @@ func (ac *AuthController) SignInUser(ctx *gin.Context) {
 	// }
 
 	if err := utils.VerifyPassword(user.Password, payload.Password); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message4": "Invalid Username or Password"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Invalid Username or Password"})
 		return
 	}
 
