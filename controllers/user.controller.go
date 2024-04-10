@@ -709,7 +709,7 @@ func (uc *UserController) CheckHN(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "This HN is already in use"})
 		return
 	} else {
-		ctx.JSON(http.StatusBadRequest, gin.H{"status": "success", "message": "This HN can use"})
+		ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "This HN can use"})
 		return
 	}
 }
