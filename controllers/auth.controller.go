@@ -255,3 +255,49 @@ func (ac *AuthController) LogoutUser(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"status": "success"})
 }
+
+// Change password
+func (ac *AuthController) ChangePassword(ctx *gin.Context) {
+	currentUser := ctx.MustGet("currentUser").(models.User)
+	var payload = struct {
+		CurrentPassword string `json:"currentPassword"`
+		NewPassword     string `json:"newPassword"`
+		ConfirmPassword string `json:"confirmPassword"`
+	}{}
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+
+	if err := utils.VerifyPassword(currentUser.Password, payload.CurrentPassword); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Wrong current password"})
+		return
+	}
+
+	if payload.CurrentPassword == payload.NewPassword {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "New password cannot be the same as the current password"})
+		return
+	}
+
+	if payload.NewPassword != payload.ConfirmPassword {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "New password and Confirm password do not match"})
+		return
+	}
+
+	hashedPassword, err := utils.HashPassword(payload.NewPassword)
+	if err != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": err.Error()})
+		return
+	}
+
+	updatePassword := &models.User{
+		Password: hashedPassword,
+	}
+	result1 := ac.DB.Model(&currentUser).Updates(updatePassword)
+	if result1.Error != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Can not update password"})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "Change password success"})
+
+}

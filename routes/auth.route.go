@@ -14,12 +14,14 @@ func NewAuthRouteController(authController controllers.AuthController) AuthRoute
 	return AuthRouteController{authController}
 }
 
-func (rc *AuthRouteController) AuthRoute(rg *gin.RouterGroup) {
+func (ac *AuthRouteController) AuthRoute(rg *gin.RouterGroup) {
 	router := rg.Group("/auth")
 
-	router.POST("/register", rc.authController.SignUpUser)
-	router.POST("/register/other", middleware.DeserializeUser(), rc.authController.SignUpUser)
-	router.POST("/login", rc.authController.SignInUser)
-	router.POST("/refresh", rc.authController.RefreshAccessToken)
-	router.GET("/logout", middleware.DeserializeUser(), rc.authController.LogoutUser)
+	router.POST("/register", ac.authController.SignUpUser)
+	router.POST("/register/other", middleware.DeserializeUser(), ac.authController.SignUpUser)
+	router.POST("/login", ac.authController.SignInUser)
+	router.POST("/refresh", ac.authController.RefreshAccessToken)
+	router.GET("/logout", middleware.DeserializeUser(), ac.authController.LogoutUser)
+	router.POST("/change-password", middleware.DeserializeUser(), ac.authController.ChangePassword)
+
 }
